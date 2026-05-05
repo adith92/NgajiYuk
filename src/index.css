@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-default: #3b82f6; /* blue-500 */
+  --color-primary-ocean: #06b6d4; /* cyan-500 */
+  --color-primary-forest: #22c55e; /* green-500 */
+  --color-primary-sunset: #f97316; /* orange-500 */
+  --color-primary-galaxy: #8b5cf6; /* violet-500 */
+  --color-primary-candy: #ec4899; /* pink-500 */
+  --color-primary-sunshine: #eab308; /* yellow-500 */
+  --color-primary-royal: #6366f1; /* indigo-500 */
+
+  --color-bg-default: #eff6ff; /* blue-50 */
+  --color-bg-ocean: #ecfeff; /* cyan-50 */
+  --color-bg-forest: #f0fdf4; /* green-50 */
+  --color-bg-sunset: #fff7ed; /* orange-50 */
+  --color-bg-galaxy: #f5f3ff; /* violet-50 */
+  --color-bg-candy: #fdf2f8; /* pink-50 */
+  --color-bg-sunshine: #fefce8; /* yellow-50 */
+  --color-bg-royal: #eef2ff; /* indigo-50 */
+}
+
+@layer utilities {
+  .theme-default {
+    --bg-color: var(--color-bg-default);
+    --primary-color: var(--color-primary-default);
+  }
+  .theme-ocean {
+    --bg-color: var(--color-bg-ocean);
+    --primary-color: var(--color-primary-ocean);
+  }
+  .theme-forest {
+    --bg-color: var(--color-bg-forest);
+    --primary-color: var(--color-primary-forest);
+  }
+  .theme-sunset {
+    --bg-color: var(--color-bg-sunset);
+    --primary-color: var(--color-primary-sunset);
+  }
+  .theme-galaxy {
+    --bg-color: var(--color-bg-galaxy);
+    --primary-color: var(--color-primary-galaxy);
+  }
+  .theme-candy {
+    --bg-color: var(--color-bg-candy);
+    --primary-color: var(--color-primary-candy);
+  }
+  .theme-sunshine {
+    --bg-color: var(--color-bg-sunshine);
+    --primary-color: var(--color-primary-sunshine);
+  }
+  .theme-royal {
+    --bg-color: var(--color-bg-royal);
+    --primary-color: var(--color-primary-royal);
+  }
+}
+
+body {
+  background-color: var(--bg-color, var(--color-bg-default));
+  transition: background-color 0.5s ease;
+  font-family: 'Nunito', sans-serif; /* A nice rounded font for kids */
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

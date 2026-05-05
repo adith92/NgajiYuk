@@ -1,0 +1,41 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with language, theme, and overall progress.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Auth UID" },
+        "name": { "type": "string", "description": "Child's name" },
+        "theme": { "type": "string", "enum": ["default", "ocean", "forest", "sunset", "galaxy", "candy", "sunshine", "royal"], "description": "Selected theme" },
+        "language": { "type": "string", "enum": ["id", "ja", "bew"], "description": "Language preference" },
+        "avatarId": { "type": "string", "description": "Avatar ID for the kid" },
+        "createdAt": { "type": "number", "description": "Creation timestamp" },
+        "updatedAt": { "type": "number", "description": "Update timestamp" }
+      },
+      "required": ["uid", "name", "theme", "language", "createdAt", "updatedAt"]
+    },
+    "Progress": {
+      "title": "Progress",
+      "description": "Learning progress tracking per module",
+      "type": "object",
+      "properties": {
+        "moduleId": { "type": "string", "description": "Module ID (e.g., hijaiyah, sholat, doa)" },
+        "completedItems": { "type": "array", "items": { "type": "string" }, "description": "List of completed items in the module" },
+        "points": { "type": "number", "description": "Experience points gained in this module" },
+        "updatedAt": { "type": "number", "description": "Update timestamp" }
+      },
+      "required": ["moduleId", "completedItems", "points", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Stores user profiles."
+    },
+    "/users/{userId}/progress/{moduleId}": {
+      "schema": { "$ref": "#/entities/Progress" },
+      "description": "Stores progress for each learning module."
+    }
+  }
+}

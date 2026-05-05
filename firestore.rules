@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    
+    // Auth constraint: email verified or anonymous login usually standard for kids apps, let's just check isSignedIn()
+    // For this app, often users might be anonymous first or email, so we just use isSignedIn.
+    
+    function isValidId(id) { 
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+
+    function isValidUserProfile(data, expectedUid) {
+      return data.keys().hasAll(['uid', 'name', 'theme', 'language', 'createdAt', 'updatedAt'])
+        && data.keys().size() >= 6 && data.keys().size() <= 7 // optional avatarId
+        && data.uid == expectedUid // Validate ownership
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.theme is string && data.theme in ['default', 'ocean', 'forest', 'sunset', 'galaxy', 'candy', 'sunshine', 'royal']
+        && data.language is string && data.language in ['id', 'ja', 'bew']
+        && ( !('avatarId' in data.keys()) || (data.avatarId is string && data.avatarId.size() <= 50) )
+        && data.createdAt is number
+        && data.updatedAt is number;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // Users shouldn't list all users
+      
+      allow create: if isOwner(userId)
+        && isValidId(userId)
+        && isValidUserProfile(incoming(), userId)
+        && incoming().createdAt == request.time.toMillis()
+        && incoming().updatedAt == request.time.toMillis();
+      
+      allow update: if isOwner(userId)
+        && isValidUserProfile(incoming(), userId)
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time.toMillis()
+        && (
+           incoming().diff(existing()).affectedKeys().hasOnly(['name', 'theme', 'language', 'avatarId', 'updatedAt'])
+        );
+        
+      allow delete: if false;
+
+      function isValidProgress(data, moduleId) {
+         return data.keys().hasAll(['moduleId', 'completedItems', 'points', 'updatedAt'])
+           && data.keys().size() == 4
+           && data.moduleId == moduleId
+           && data.completedItems is list
+           && data.completedItems.size() <= 100
+           && (data.completedItems.size() == 0 || data.completedItems[0] is string)
+           && data.points is number
+           && data.updatedAt is number;
+      }
+
+      match /progress/{moduleId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId); // They can list their own progress
+        
+        allow create: if isOwner(userId)
+          && isValidId(moduleId)
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && isValidProgress(incoming(), moduleId)
+          && incoming().updatedAt == request.time.toMillis();
+          
+        allow update: if isOwner(userId)
+          && isValidProgress(incoming(), moduleId)
+          && incoming().moduleId == existing().moduleId
+          && incoming().updatedAt == request.time.toMillis()
+          && (
+             incoming().diff(existing()).affectedKeys().hasOnly(['completedItems', 'points', 'updatedAt'])
+          );
+          
+        allow delete: if false;
+      }
+    }
+  }
+}

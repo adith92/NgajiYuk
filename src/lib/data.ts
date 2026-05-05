@@ -1,0 +1,45 @@
+export const hijaiyahData = [
+  { id: 'alif', label: 'ا', name: 'Alif', jp: 'アリフ', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-red-400' },
+  { id: 'ba', label: 'ب', name: 'Ba', jp: 'バー', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-orange-400' },
+  { id: 'ta', label: 'ت', name: 'Ta', jp: 'ター', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-yellow-400' },
+  { id: 'tsa', label: 'ث', name: 'Tsa', jp: 'サー', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-green-400' },
+  { id: 'jim', label: 'ج', name: 'Jim', jp: 'ジーム', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-teal-400' },
+  { id: 'ha', label: 'ح', name: 'Ha', jp: 'ハー', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-cyan-400' },
+  { id: 'kha', label: 'خ', name: 'Kha', jp: 'ハー', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-blue-400' },
+  { id: 'dal', label: 'د', name: 'Dal', jp: 'ダール', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-indigo-400' },
+  { id: 'dzal', label: 'ذ', name: 'Dzal', jp: 'ザール', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-purple-400' },
+  { id: 'ra', label: 'ر', name: 'Ra', jp: 'ラー', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-pink-400' },
+  { id: 'zai', label: 'ز', name: 'Zai', jp: 'ザーイ', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-rose-400' },
+  { id: 'sin', label: 'س', name: 'Sin', jp: 'シーン', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-red-400' },
+  { id: 'syin', label: 'ش', name: 'Syin', jp: 'シーン', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-orange-400' },
+  { id: 'shad', label: 'ص', name: 'Shad', jp: 'サード', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-yellow-400' },
+  { id: 'dhad', label: 'ض', name: 'Dhad', jp: 'ダード', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-green-400' },
+  { id: 'tha', label: 'ط', name: 'Tha', jp: 'ター', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-blue-400' },
+  { id: 'zha', label: 'ظ', name: 'Zha', jp: 'ザー', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-purple-400' },
+  { id: 'ain', label: 'ع', name: 'Ain', jp: 'アイン', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-pink-400' },
+  { id: 'ghain', label: 'غ', name: 'Ghain', jp: 'ガイン', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-orange-400' },
+  { id: 'fa', label: 'ف', name: 'Fa', jp: 'ファー', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-green-400' },
+  { id: 'qaf', label: 'ق', name: 'Qaf', jp: 'カーフ', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-blue-400' },
+  { id: 'kaf', label: 'ك', name: 'Kaf', jp: 'カーフ', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-purple-400' },
+  { id: 'lam', label: 'ل', name: 'Lam', jp: 'ラーム', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-pink-400' },
+  { id: 'mim', label: 'م', name: 'Mim', jp: 'ミーム', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-red-400' },
+  { id: 'nun', label: 'ن', name: 'Nun', jp: 'ヌーン', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-orange-400' },
+  { id: 'waw', label: 'و', name: 'Waw', jp: 'ワーウ', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-yellow-400' },
+  { id: 'ha_besar', label: 'ه', name: 'Ha', jp: 'ハー', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-green-400' },
+  { id: 'lam_alif', label: 'لا', name: 'Lam Alif', jp: 'ラーム・アリフ', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-blue-400' },
+  { id: 'hamzah', label: 'ء', name: 'Hamzah', jp: 'ハムザ', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-purple-400' },
+  { id: 'ya', label: 'ي', name: 'Ya', jp: 'ヤー', audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_73229babb2.mp3', color: 'bg-pink-400' },
+];
+
+export const doaData = [
+  { id: 'tidur_sebelum', name: { id: 'Doa Sebelum Tidur', ja: '寝る前のお祈り', bew: 'Doa Mo Tidur' }, arabic: 'بِسْمِكَ اللّٰهُمَّ اَحْيَا وَاَمُوْتُ', latin: 'Bismikallaahumma ahyaa wa amuutu', arti: { id: 'Dengan nama-Mu, ya Allah, aku hidup dan mati.', ja: 'アッラーの御名において、私は生き、そして死にます。', bew: 'Bismillah Ya Allah, ane idup dan mati.' } },
+  { id: 'tidur_bangun', name: { id: 'Doa Bangun Tidur', ja: '起きたときのお祈り', bew: 'Doa Melek Tidur'}, arabic: 'اَلْحَمْدُ لِلّٰهِ الَّذِيْ اَحْيَانَا بَعْدَ مَآ اَمَاتَنَا وَاِلَيْهِ النُّشُوْرُ', latin: 'Alhamdulillaahil ladzii ahyaanaa ba\'da maa amaatanaa wa ilaihin nusyuur', arti: { id: 'Segala puji bagi Allah yang menghidupkan kami setelah mematikan kami, dan kepada-Nya kami dikembalikan.', ja: '私たちを死なせた後に生かしてくださったアッラーに全ての賛美を。そして彼のもとに集められます。', bew: 'Alhamdulillah dah dikasi idup lagi abis tidur, ntar kite balik ama Allah.' } },
+  { id: 'makan_sebelum', name: { id: 'Doa Sebelum Makan', ja: '食べる前のお祈り', bew: 'Doa Mo Makan' }, arabic: 'اَللّٰهُمَّ بَارِكْ لَنَا فِيْمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ', latin: 'Allaahumma baarik lanaa fiimaa razaqtanaa wa qinaa \'adzaaban naar', arti: { id: 'Ya Allah, berkahilah kami atas rezeki yang telah Engkau berikan kepada kami, dan peliharalah kami dari siksa api neraka.', ja: 'アッラーよ、あなたが私たちに与えた糧を祝福し、火の罰から私たちを守ってください。', bew: 'Ya Allah, berkahin yak rejeki yang udah dikasi, ame jauhin kite dari api neraka.' } },
+];
+
+export const sholatData = [
+  { id: 'niat_subuh', name: { id: 'Niat Subuh', ja: 'ファジュルの意図', bew: 'Niat Subuh' }, arabic: 'أُصَلِّى فَرْضَ الصُّبْح رَكَعتَيْنِ مُسْتَقْبِلَ الْقِبْلَةِ أَدَاءً لله تَعَالَى', latin: 'Ushalli fardhas subhi rak\'ataini mustaqbilal qiblati adaa-an lillaahi ta\'aalaa' },
+  { id: 'takbir', name: { id: 'Takbiratul Ihram', ja: 'タクビール', bew: 'Takbir' }, arabic: 'اللَّهُ أَكْبَرُ', latin: 'Allahu Akbar' },
+  { id: 'alfatihah', name: { id: 'Al-Fatihah', ja: 'アル・ファーティハ', bew: 'Al-Fatihah' }, arabic: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ...', latin: 'Bismillahir rahmanir rahim...' },
+  { id: 'ruku', name: { id: 'Doa Ruku\'', ja: 'ルクー（お辞儀）', bew: 'Doa Ruku' }, arabic: 'سُبْحَانَ رَبِّيَ الْعَظِيمِ وَبِحَمْدِهِ', latin: 'Subhaana rabbiyal \'adhiimi wabihamdih (3x)' },
+];
