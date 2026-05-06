@@ -333,7 +333,7 @@ function SholatView({ onBack }: { onBack: () => void }) {
   );
 }
 
-function ProfileView({ onBack }: { onBack: () => void }) {
+function ProfileView({ onBack, onLogout }: { onBack: () => void, onLogout: () => void }) {
   const { currentUserUid, users, updateProfile, logout } = useAppStore();
   const user = currentUserUid ? users[currentUserUid] : null;
   const t = useTranslation(user?.language) as any;
@@ -405,7 +405,10 @@ function ProfileView({ onBack }: { onBack: () => void }) {
 
             <div className="pt-6 mt-6 border-t-2 border-gray-200">
               <button 
-                onClick={logout}
+                onClick={() => {
+                  logout();
+                  onLogout();
+                }}
                 className="w-full flex items-center justify-center gap-2 bg-gray-100 text-gray-600 py-4 rounded-2xl font-bold hover:bg-gray-200 active:scale-95 transition-all"
               >
                 <LogOut size={20}/> Ganti Anak
@@ -419,73 +422,119 @@ function ProfileView({ onBack }: { onBack: () => void }) {
   );
 }
 
+function LandingPage({ onEnter }: { onEnter: () => void }) {
+  const { currentUserUid, users, login, landingTheme, setLandingTheme } = useAppStore();
+  const [localTheme, setLocalTheme] = useState(landingTheme);
+
+  useEffect(() => {
+    document.body.className = `theme-${localTheme}`;
+    setLandingTheme(localTheme);
+  }, [localTheme, setLandingTheme]);
+
+  const kids = [
+    { uid: 'abeel', name: 'Abeel', color: 'bg-blue-500 border-blue-700', emoji: '🧑' },
+    { uid: 'emier', name: 'Emier', color: 'bg-green-500 border-green-700', emoji: '🧑' },
+    { uid: 'emily', name: 'emily', color: 'bg-pink-500 border-pink-700', emoji: '👧' }
+  ];
+
+  const handleLogin = (uid: string, name: string) => {
+    login(uid, name);
+    onEnter();
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="w-full max-w-3xl"
+      >
+        <div className="bg-white p-6 md:p-10 rounded-[3rem] shadow-2xl border-4 border-white/50">
+          <div className="bg-blue-100 p-6 rounded-full inline-block mb-8 text-blue-500 shadow-inner">
+            <BookOpen size={64} />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black text-gray-800 mb-6 tracking-tight">Siapa yang mau belajar?</h1>
+          
+          <div className="mb-8">
+            <h3 className="text-gray-500 font-bold uppercase tracking-wider mb-4 text-sm">Pilih Tema Dulu Yuk!</h3>
+            <div className="flex flex-wrap justify-center gap-2">
+              {['default', 'ocean', 'forest', 'sunset', 'galaxy', 'candy', 'sunshine', 'royal'].map(th => {
+                  const isActive = localTheme === th;
+                  return (
+                    <button
+                      key={th}
+                      onClick={() => setLocalTheme(th as any)}
+                      className={cn(
+                        "px-4 py-2 rounded-full font-bold transition-all border-2",
+                        isActive ? "border-[var(--primary-color)] bg-[var(--primary-color)] text-white" : "border-gray-200 text-gray-500 hover:bg-gray-50"
+                      )}
+                    >
+                      {th}
+                    </button>
+                  );
+                })}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
+            {kids.map((kid, i) => (
+              <motion.button
+                key={kid.uid}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleLogin(kid.uid, kid.name)}
+                className={cn(
+                  "flex flex-col items-center justify-center p-6 rounded-3xl text-white shadow-xl border-b-[8px] active:border-b-0 active:translate-y-2 transition-all group",
+                  kid.color
+                )}
+              >
+                <span className="text-6xl mb-4 group-hover:scale-110 transition-transform">{kid.emoji}</span>
+                <span className="text-2xl font-black">{kid.name}</span>
+              </motion.button>
+            ))}
+          </div>
+
+          {currentUserUid && users[currentUserUid] && (
+             <div className="mt-8 pt-8 border-t-2 border-gray-100">
+               <button 
+                 onClick={onEnter}
+                 className="bg-[var(--primary-color)] text-white px-8 py-4 rounded-3xl font-bold shadow-xl border-b-[8px] border-black/20 hover:scale-105 active:scale-95 active:border-b-0 active:translate-y-2 transition-all text-xl"
+               >
+                 Lanjut sebagai {users[currentUserUid].name} &rarr;
+               </button>
+             </div>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function App() {
-  const { initializeApp, isReady, currentUserUid, users, login } = useAppStore();
-  const [view, setView] = useState('menu');
+  const { initializeApp, isReady, currentUserUid, users } = useAppStore();
+  const [view, setView] = useState('landing');
 
   useEffect(() => {
     initializeApp();
   }, [initializeApp]);
   
   useEffect(() => {
-    const user = currentUserUid ? users[currentUserUid] : null;
-    if (user?.theme) {
-      document.body.className = `theme-${user.theme}`;
+    if (view !== 'landing') {
+       const user = currentUserUid ? users[currentUserUid] : null;
+       if (user?.theme) {
+         document.body.className = `theme-${user.theme}`;
+       }
     }
-  }, [currentUserUid, users]);
+  }, [currentUserUid, users, view]);
 
   if (!isReady) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-blue-50">
         <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}>
           <Star className="text-blue-500 w-16 h-16" />
-        </motion.div>
-      </div>
-    );
-  }
-
-  if (!currentUserUid) {
-    const kids = [
-      { uid: 'abeel', name: 'Abeel', color: 'bg-blue-500 border-blue-700', emoji: '🧑' },
-      { uid: 'emier', name: 'Emier', color: 'bg-green-500 border-green-700', emoji: '🧑' },
-      { uid: 'emily', name: 'emily', color: 'bg-pink-500 border-pink-700', emoji: '👧' }
-    ];
-
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-[#eff6ff] p-6 text-center">
-        <Toaster position="top-center" />
-        <motion.div
-           initial={{ scale: 0.9, opacity: 0 }}
-           animate={{ scale: 1, opacity: 1 }}
-           className="w-full max-w-3xl"
-        >
-          <div className="bg-white p-6 md:p-10 rounded-[3rem] shadow-2xl border-4 border-white/50">
-            <div className="bg-blue-100 p-6 rounded-full inline-block mb-8 text-blue-500 shadow-inner">
-              <BookOpen size={64} />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-black text-gray-800 mb-6 tracking-tight">Siapa yang mau belajar?</h1>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-10">
-               {kids.map((kid, i) => (
-                 <motion.button
-                   key={kid.uid}
-                   initial={{ y: 20, opacity: 0 }}
-                   animate={{ y: 0, opacity: 1 }}
-                   transition={{ delay: i * 0.1 }}
-                   whileHover={{ scale: 1.05 }}
-                   whileTap={{ scale: 0.95 }}
-                   onClick={() => login(kid.uid, kid.name)}
-                   className={cn(
-                     "flex flex-col items-center justify-center p-8 rounded-3xl text-white shadow-xl border-b-[8px] active:border-b-0 active:translate-y-2 transition-all group",
-                     kid.color
-                   )}
-                 >
-                   <span className="text-6xl mb-4 group-hover:scale-110 transition-transform">{kid.emoji}</span>
-                   <span className="text-2xl font-black">{kid.name}</span>
-                 </motion.button>
-               ))}
-            </div>
-          </div>
         </motion.div>
       </div>
     );
@@ -502,11 +551,12 @@ export default function App() {
           exit={{ opacity: 0, x: -50 }}
           className="flex-1 flex flex-col"
         >
+          {view === 'landing' && <LandingPage onEnter={() => setView('menu')} />}
           {view === 'menu' && <MainMenu setView={setView} />}
           {view === 'hijaiyah' && <HijaiyahView onBack={() => setView('menu')} />}
           {view === 'kuis' && <KuisView onBack={() => setView('menu')} />}
           {view === 'hafalan' && <HafalanView onBack={() => setView('menu')} />}
-          {view === 'profile' && <ProfileView onBack={() => setView('menu')} />}
+          {view === 'profile' && <ProfileView onBack={() => setView('menu')} onLogout={() => setView('landing')} />}
           {view === 'doa' && <DoaView onBack={() => setView('menu')} />}
           {view === 'sholat' && <SholatView onBack={() => setView('menu')} />}
         </motion.div>

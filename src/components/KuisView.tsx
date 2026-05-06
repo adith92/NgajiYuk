@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAppStore } from '../lib/store';
 import { useTranslation } from '../lib/i18n';
-import { hijaiyahData } from '../lib/data';
+import { hijaiyahData } from '../data/hijaiyah';
 import { Header } from './Header';
 import { motion, AnimatePresence } from 'motion/react';
 import { Volume2, Trophy } from 'lucide-react';

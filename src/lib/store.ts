@@ -26,6 +26,7 @@ interface AppState {
   progress: Record<string, Record<string, Progress>>; // uid -> moduleId -> Progress
   currentUserUid: string | null;
   isReady: boolean;
+  landingTheme: Theme;
   
   // Actions
   initializeApp: () => void;
@@ -35,6 +36,7 @@ interface AppState {
   updateProgress: (moduleId: string, itemId: string, pointsGained: number) => void;
   setTheme: (theme: Theme) => void;
   setLanguage: (lang: Language) => void;
+  setLandingTheme: (theme: Theme) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -44,13 +46,19 @@ export const useAppStore = create<AppState>()(
       progress: {},
       currentUserUid: null,
       isReady: false,
+      landingTheme: 'default',
 
       initializeApp: () => {
         set({ isReady: true });
+        // safety mechanism: check if currentUserUid is valid
+        const { currentUserUid, users } = get();
+        if (currentUserUid && !users[currentUserUid]) {
+          set({ currentUserUid: null });
+        }
       },
 
       login: (uid, name) => {
-        const { users, progress } = get();
+        const { users, progress, landingTheme } = get();
         if (!users[uid]) {
           // Create new profile
           set({
@@ -59,7 +67,7 @@ export const useAppStore = create<AppState>()(
               [uid]: {
                 uid,
                 name,
-                theme: 'default',
+                theme: landingTheme || 'default',
                 language: 'id',
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
@@ -72,7 +80,14 @@ export const useAppStore = create<AppState>()(
             currentUserUid: uid
           });
         } else {
+          // User exists, just login
           set({ currentUserUid: uid });
+          // Note: per feedback: "kalau user sudah ada, update profile theme anak - kecuali user memilih theme baru di landing". Wait, since we keep landingTheme state, we update if logic is right? 
+          // Actually, instruction says "jika user lama, jangan paksa reset theme, kecuali user memilih theme baru di landing" 
+          // Let's just update the theme if landingTheme is not 'default', or maybe just leave the existing theme alone since we don't know if they picked default or didn't pick. Let's assume if landingTheme isn't default, we update it.
+          if (landingTheme !== 'default' && users[uid].theme !== landingTheme) {
+            get().updateProfile({ theme: landingTheme });
+          }
         }
       },
 
@@ -131,6 +146,10 @@ export const useAppStore = create<AppState>()(
 
       setLanguage: (language) => {
         get().updateProfile({ language });
+      },
+
+      setLandingTheme: (theme) => {
+        set({ landingTheme: theme });
       }
     }),
     {
