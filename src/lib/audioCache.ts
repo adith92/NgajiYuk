@@ -1,5 +1,4 @@
 import { openDB } from 'idb';
-import { generateTtsAudio } from './vynaa';
 
 const DB_NAME = 'ngajiyuk-audio-cache';
 const STORE_NAME = 'audios';
@@ -34,37 +33,40 @@ export async function saveAudioToCache(id: string, blob: Blob) {
   await db.put(STORE_NAME, blob, id);
 }
 
+export async function fetchAndCacheAudio(id: string, url: string): Promise<Blob | null> {
+  let blob = await getAudioFromCache(id);
+  if (!blob) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP Error ${res.status} fetching ${url}`);
+      blob = await res.blob();
+      await saveAudioToCache(id, blob);
+    } catch (error) {
+      console.error(`Failed to fetch audio for ${id}:`, error);
+      return null;
+    }
+  }
+  return blob;
+}
+
 /**
  * Main audio playback engine.
  * 1. Checks Cache
- * 2. If not found, generates via API
+ * 2. If not found, fetches from public folder
  * 3. Saves to cache
  * 4. Plays audio
  * Returns the HTMLAudioElement if successful, allowing consumers to modify playback speed/loop.
  */
-export async function playAudio(id: string, text: string, lang: 'ar' | 'id', apiKey: string): Promise<HTMLAudioElement | null> {
-  if (!apiKey) {
-    console.warn('API Key not set for TTS, fallback to speech synthesis if possible.');
-    return null;
-  }
-
-  let blob = await getAudioFromCache(id);
+export async function playAudio(id: string, url: string): Promise<HTMLAudioElement | null> {
+  const blob = await fetchAndCacheAudio(id, url);
   
-  if (!blob) {
-    try {
-      blob = await generateTtsAudio({ text, lang, apiKey });
-      await saveAudioToCache(id, blob);
-    } catch (error) {
-      console.error(`Failed to generate TTS for ${id}:`, error);
-      return null;
-    }
-  }
+  if (!blob) return null;
 
-  const url = URL.createObjectURL(blob);
-  const audio = new Audio(url);
+  const objectUrl = URL.createObjectURL(blob);
+  const audio = new Audio(objectUrl);
   
   audio.onended = () => {
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(objectUrl);
   };
   
   try {
@@ -75,4 +77,3 @@ export async function playAudio(id: string, text: string, lang: 'ar' | 'id', api
     return null;
   }
 }
-

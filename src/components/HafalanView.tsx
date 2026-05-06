@@ -5,8 +5,7 @@ import { surahData } from '../data/surah';
 import { Header } from './Header';
 import { motion } from 'motion/react';
 import { Play, Pause, Repeat, FastForward } from 'lucide-react';
-import { getAudioFromCache, saveAudioToCache } from '../lib/audioCache';
-import { generateTtsAudio } from '../lib/vynaa';
+import { fetchAndCacheAudio } from '../lib/audioCache';
 import toast from 'react-hot-toast';
 
 function cnHelper(...classes: (string | undefined | null | false)[]) {
@@ -14,7 +13,7 @@ function cnHelper(...classes: (string | undefined | null | false)[]) {
 }
 
 export function HafalanView({ onBack }: { onBack: () => void }) {
-  const { currentUserUid, users, globalVynaaKey } = useAppStore();
+  const { currentUserUid, users } = useAppStore();
   const user = currentUserUid ? users[currentUserUid] : null;
   const t = useTranslation(user?.language) as any;
   const [selectedAyatId, setSelectedAyatId] = useState(surahData[0].id);
@@ -50,24 +49,15 @@ export function HafalanView({ onBack }: { onBack: () => void }) {
     if (audioRef.current) {
         audioRef.current.pause();
     }
-    
-    if (!globalVynaaKey) {
-        toast.error('API Key VYNAA belum diatur. Set di Profile untuk memutar audio!');
-        return;
-    }
 
     const cacheKey = `surah_${selectedAyat.id}`;
-    let blob = await getAudioFromCache(cacheKey);
+    
+    let blob = await fetchAndCacheAudio(cacheKey, `/audio/surah/${selectedAyat.id}.mp3`);
+    
     if (!blob) {
-       toast.loading('Loading audio...', { id: 'tts-load' });
-       try {
-         blob = await generateTtsAudio({ text: selectedAyat.audioText, lang: 'ar', apiKey: globalVynaaKey });
-         await saveAudioToCache(cacheKey, blob);
-         toast.dismiss('tts-load');
-       } catch (err) {
-         toast.error('Gagal generate audio', { id: 'tts-load' });
-         return;
-       }
+       toast.error('Gagal memutar audio');
+       setIsPlaying(false);
+       return;
     }
 
     const url = URL.createObjectURL(blob);

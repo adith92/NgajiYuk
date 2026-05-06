@@ -6,12 +6,16 @@ export interface DoaData {
   translation: string;
   audioText: string;
   category?: string;
+  audioUrl?: string;
+  needsReview?: boolean;
 }
 
 export const doaData: DoaData[] = [
   {
     id: 'makan_sebelum',
     title: 'Doa Sebelum Makan',
+    needsReview: true,
+    audioUrl: '/audio/doa/makan_sebelum.mp3',
     arabic: 'اللَّهُمَّ بَارِكْ لَنَا فِيمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ',
     latin: 'Allahumma baarik lanaa fiimaa rozaqtanaa wa qinaa \'adzaaban naar',
     translation: 'Ya Allah, berkahilah kami dalam rezeki yang telah Engkau berikan kepada kami dan peliharalah kami dari siksa api neraka.',

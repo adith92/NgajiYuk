@@ -5,12 +5,16 @@ export interface SholatData {
   latin: string;
   translation: string;
   audioText: string;
+  audioUrl?: string;
+  needsReview?: boolean;
 }
 
 export const sholatData: SholatData[] = [
   {
     id: 'niat',
     title: 'Niat Sholat',
+    needsReview: true,
+    audioUrl: '/audio/sholat/niat.mp3',
     arabic: 'أُصَلِّي فَرْضَ الْمَغْرِبِ ثَلَاثَ رَكَعَاتٍ مُسْتَقْبِلَ الْقِبْلَةِ أَدَاءً لِلَّهِ تَعَالَى',
     latin: 'Ushalli fardhol maghribi tsalaatsa raka\'aatin mustaqbilal qiblati adaa\'an lillaahi ta\'aalaa.',
     translation: 'Aku berniat sholat fardhu Maghrib tiga rakaat menghadap kiblat karena Allah Ta\'ala. (Contoh niat sholat Maghrib)',

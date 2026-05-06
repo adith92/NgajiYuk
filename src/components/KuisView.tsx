@@ -22,7 +22,7 @@ function triggerConfetti() {
 }
 
 export function KuisView({ onBack }: { onBack: () => void }) {
-  const { currentUserUid, users, updateProgress, globalVynaaKey } = useAppStore();
+  const { currentUserUid, users, updateProgress } = useAppStore();
   const user = currentUserUid ? users[currentUserUid] : null;
   const t = useTranslation(user?.language) as any;
   const [options, setOptions] = useState<any[]>([]);
@@ -47,7 +47,7 @@ export function KuisView({ onBack }: { onBack: () => void }) {
   const announceTarget = (char: any) => {
     if (!char) return;
     const name = char.name; // ID/AR fallback handled via text
-    playAudio(`hijaiyah_kuis_${char.id}`, `Temukan huruf ${name}`, 'id', globalVynaaKey);
+    playAudio(`kuis_hijaiyah_${char.id}`, `/audio/kuis/hijaiyah_${char.id}.mp3`);
   };
 
   useEffect(() => {
@@ -63,13 +63,13 @@ export function KuisView({ onBack }: { onBack: () => void }) {
        setMessage(t.correct);
        updateProgress('kuis_hijaiyah', Date.now().toString(), 15);
        triggerConfetti();
-       playAudio('kuis_correct', t.correct, 'id', globalVynaaKey);
+       playAudio('kuis_correct', `/audio/kuis/correct.mp3`);
 
        setTimeout(generateQuiz, 2000);
     } else {
        setStatus('wrong');
        setMessage(t.wrong);
-       playAudio('kuis_wrong', t.wrong, 'id', globalVynaaKey);
+       playAudio('kuis_wrong', `/audio/kuis/wrong.mp3`);
 
        setTimeout(() => {
          setStatus('playing');

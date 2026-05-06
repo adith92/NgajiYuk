@@ -5,6 +5,8 @@ export interface SurahData {
   latin: string;
   translation: string;
   audioText: string;
+  audioUrl?: string;
+  needsReview?: boolean;
 }
 
 export const surahData: SurahData[] = [
@@ -12,6 +14,8 @@ export const surahData: SurahData[] = [
     id: 'alfatihah',
     title: 'Al-Fatihah',
     // TODO: verify with ustadz/source
+    needsReview: true,
+    audioUrl: '/audio/surah/alfatihah.mp3',
     arabic: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ. الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ. الرَّحْمَنِ الرَّحِيمِ. مَالِكِ يَوْمِ الدِّينِ. إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ. اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ. صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ.',
     latin: 'Bismillaahir-rohmaanir-rohiim. Alhamdulillaahi robbil-\'aalamiin. Ar-rohmaanir-rohiim. Maaliki yaumid-diin. Iyyaaka na\'budu wa iyyaaka nasta\'iin. Ihdinas-shirothol-mustaqiim. Shirotholladziina an\'amta \'alaihim ghoiril-maghdhuubi \'alaihim wa ladh-dholliin.',
     translation: 'Dengan menyebut nama Allah Yang Maha Pengasih lagi Maha Penyayang. Segala puji bagi Allah, Tuhan semesta alam. Yang Maha Pengasih lagi Maha Penyayang. Pemilik hari pembalasan. Hanya kepada Engkaulah kami menyembah dan hanya kepada Engkaulah kami memohon pertolongan. Tunjukilah kami jalan yang lurus. (yaitu) jalan orang-orang yang telah Engkau beri nikmat kepadanya; bukan (jalan) mereka yang dimurkai, dan bukan (pula jalan) mereka yang sesat.',

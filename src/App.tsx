@@ -12,8 +12,7 @@ import { twMerge } from 'tailwind-merge';
 import { Header } from './components/Header';
 import { HafalanView } from './components/HafalanView';
 import { KuisView } from './components/KuisView';
-import { checkVynaaKey, generateTtsAudio } from './lib/vynaa';
-import { countAudioCache, clearAudioCache, saveAudioToCache, playAudio } from './lib/audioCache';
+import { countAudioCache, clearAudioCache, playAudio, fetchAndCacheAudio } from './lib/audioCache';
 import toast, { Toaster } from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 
@@ -31,7 +30,7 @@ function triggerConfetti() {
 }
 
 function MainMenu({ setView }: { setView: (v: string) => void }) {
-  const { currentUserUid, users, progress, globalVynaaKey } = useAppStore();
+  const { currentUserUid, users, progress } = useAppStore();
   const user = currentUserUid ? users[currentUserUid] : null;
   const t = useTranslation(user?.language) as any;
   const userProgress = currentUserUid ? (progress[currentUserUid] || {}) : {};
@@ -48,16 +47,11 @@ function MainMenu({ setView }: { setView: (v: string) => void }) {
   }, []);
 
   const startDownloadAll = async () => {
-    if (!globalVynaaKey) {
-       toast.error('API Key VYNAA belum diatur!');
-       return;
-    }
-    
-    const allRequests: {id: string, text: string, lang: 'ar' | 'id'}[] = [];
-    hijaiyahData.forEach(d => allRequests.push({ id: `hijaiyah_${d.id}`, text: d.audioText, lang: 'ar' }));
-    doaData.forEach(d => allRequests.push({ id: `doa_${d.id}`, text: d.audioText, lang: 'ar' }));
-    sholatData.forEach(d => allRequests.push({ id: `sholat_${d.id}`, text: d.audioText, lang: 'ar' }));
-    surahData.forEach(d => allRequests.push({ id: `surah_${d.id}`, text: d.audioText, lang: 'ar' }));
+    const allRequests: {id: string, url: string}[] = [];
+    hijaiyahData.forEach(d => allRequests.push({ id: `hijaiyah_${d.id}`, url: `/audio/hijaiyah/${d.id}.mp3` }));
+    doaData.forEach(d => allRequests.push({ id: `doa_${d.id}`, url: `/audio/doa/${d.id}.mp3` }));
+    sholatData.forEach(d => allRequests.push({ id: `sholat_${d.id}`, url: `/audio/sholat/${d.id}.mp3` }));
+    surahData.forEach(d => allRequests.push({ id: `surah_${d.id}`, url: `/audio/surah/${d.id}.mp3` }));
 
     setTotalDownload(allRequests.length);
     setDownloadProgress(0);
@@ -66,8 +60,7 @@ function MainMenu({ setView }: { setView: (v: string) => void }) {
     let count = 0;
     for (const req of allRequests) {
       try {
-        const audioBlob = await generateTtsAudio({ ...req, apiKey: globalVynaaKey });
-        await saveAudioToCache(req.id, audioBlob);
+        await fetchAndCacheAudio(req.id, req.url);
       } catch (err) {
         console.error('Failed to download audio for:', req.id);
       }
@@ -95,7 +88,7 @@ function MainMenu({ setView }: { setView: (v: string) => void }) {
           <span className="text-lg">{totalPoints} {t.points}</span>
         </div>
         
-        {globalVynaaKey && !isDownloading && cachedCount === 0 && (
+        {!isDownloading && cachedCount === 0 && (
           <div className="mt-6">
             <button onClick={startDownloadAll} className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2 mx-auto hover:scale-105 active:scale-95 transition-all">
                <Download size={20} />
@@ -114,12 +107,12 @@ function MainMenu({ setView }: { setView: (v: string) => void }) {
       </motion.div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-3xl pb-10">
-        <MenuCard onClick={() => setView('hijaiyah')} color="bg-pink-500" title={t.menu_hijaiyah} icon={<Gamepad2 size={40} />} delay={0.1} />
-        <MenuCard onClick={() => setView('kuis')} color="bg-rose-500" title={t.menu_kuis} icon={<Sparkles size={40} />} delay={0.2} />
-        <MenuCard onClick={() => setView('hafalan')} color="bg-teal-500" title={t.menu_hafalan} icon={<Headphones size={40} />} delay={0.3} />
-        <MenuCard onClick={() => setView('doa')} color="bg-blue-500" title={t.menu_doa} icon={<BookOpen size={40} />} delay={0.4} />
-        <MenuCard onClick={() => setView('sholat')} color="bg-green-500" title={t.menu_sholat} icon={<Star size={40} />} delay={0.5} />
-        <MenuCard onClick={() => setView('profile')} color="bg-purple-500" title={t.menu_profile} icon={<User size={40} />} delay={0.6} />
+        <MenuCard onClick={() => setView('hijaiyah')} color="bg-pink-500 border-pink-700" title={t.menu_hijaiyah} icon={<Gamepad2 size={40} />} delay={0.1} />
+        <MenuCard onClick={() => setView('kuis')} color="bg-rose-500 border-rose-700" title={t.menu_kuis} icon={<Sparkles size={40} />} delay={0.2} />
+        <MenuCard onClick={() => setView('hafalan')} color="bg-teal-500 border-teal-700" title={t.menu_hafalan} icon={<Headphones size={40} />} delay={0.3} />
+        <MenuCard onClick={() => setView('doa')} color="bg-blue-500 border-blue-700" title={t.menu_doa} icon={<BookOpen size={40} />} delay={0.4} />
+        <MenuCard onClick={() => setView('sholat')} color="bg-green-500 border-green-700" title={t.menu_sholat} icon={<Star size={40} />} delay={0.5} />
+        <MenuCard onClick={() => setView('profile')} color="bg-purple-500 border-purple-700" title={t.menu_profile} icon={<User size={40} />} delay={0.6} />
       </div>
     </div>
   );
@@ -136,8 +129,7 @@ function MenuCard({ color, title, icon, onClick, delay }: any) {
       onClick={onClick}
       className={cn(
         "p-4 rounded-3xl shadow-xl flex flex-col items-center justify-center gap-3 text-white font-bold text-center text-lg md:text-xl h-40 border-b-8 active:border-b-0 active:translate-y-2 transition-all",
-        color,
-        color.replace('bg-', 'border-').replace('500', '700')
+        color
       )}
     >
       <div className="bg-white/20 p-3 rounded-full">
@@ -149,7 +141,7 @@ function MenuCard({ color, title, icon, onClick, delay }: any) {
 }
 
 function HijaiyahView({ onBack }: { onBack: () => void }) {
-  const { currentUserUid, users, progress, updateProgress, globalVynaaKey } = useAppStore();
+  const { currentUserUid, users, progress, updateProgress } = useAppStore();
   const user = currentUserUid ? users[currentUserUid] : null;
   const t = useTranslation(user?.language) as any;
   const prog = currentUserUid ? progress[currentUserUid]?.['hijaiyah'] : null;
@@ -160,7 +152,7 @@ function HijaiyahView({ onBack }: { onBack: () => void }) {
     setActiveChar(hija.id);
     
     // play audio
-    await playAudio(`hijaiyah_${hija.id}`, hija.audioText, 'ar', globalVynaaKey);
+    await playAudio(`hijaiyah_${hija.id}`, `/audio/hijaiyah/${hija.id}.mp3`);
     
     if (!completed.includes(hija.id)) {
       updateProgress('hijaiyah', hija.id, 10);
@@ -225,7 +217,7 @@ function HijaiyahView({ onBack }: { onBack: () => void }) {
 }
 
 function DoaView({ onBack }: { onBack: () => void }) {
-  const { currentUserUid, users, progress, updateProgress, globalVynaaKey } = useAppStore();
+  const { currentUserUid, users, progress, updateProgress } = useAppStore();
   const user = currentUserUid ? users[currentUserUid] : null;
   const t = useTranslation(user?.language) as any;
   const prog = currentUserUid ? progress[currentUserUid]?.['doa'] : null;
@@ -272,7 +264,7 @@ function DoaView({ onBack }: { onBack: () => void }) {
               <p className="text-gray-700 font-medium bg-gray-50 p-4 rounded-xl mb-4">{arti}</p>
               
               <button 
-                onClick={() => playAudio(`doa_${doa.id}`, doa.audioText, 'ar', globalVynaaKey)}
+                onClick={() => playAudio(`doa_${doa.id}`, `/audio/doa/${doa.id}.mp3`)}
                 className="flex items-center justify-center gap-2 w-full bg-blue-100 text-blue-600 py-3 rounded-2xl font-bold active:scale-95 transition-transform"
               >
                 <Volume2 /> Dengarkan
@@ -286,7 +278,7 @@ function DoaView({ onBack }: { onBack: () => void }) {
 }
 
 function SholatView({ onBack }: { onBack: () => void }) {
-  const { currentUserUid, users, progress, updateProgress, globalVynaaKey } = useAppStore();
+  const { currentUserUid, users, progress, updateProgress } = useAppStore();
   const user = currentUserUid ? users[currentUserUid] : null;
   const t = useTranslation(user?.language) as any;
   const prog = currentUserUid ? progress[currentUserUid]?.['sholat'] : null;
@@ -328,7 +320,7 @@ function SholatView({ onBack }: { onBack: () => void }) {
               <p className="text-gray-700 font-medium bg-gray-50 p-4 rounded-xl mb-4">{sholat.translation}</p>
               
               <button 
-                onClick={() => playAudio(`sholat_${sholat.id}`, sholat.audioText, 'ar', globalVynaaKey)}
+                onClick={() => playAudio(`sholat_${sholat.id}`, `/audio/sholat/${sholat.id}.mp3`)}
                 className="flex items-center justify-center gap-2 w-full bg-blue-100 text-blue-600 py-3 rounded-2xl font-bold active:scale-95 transition-transform"
               >
                 <Volume2 /> Dengarkan
@@ -342,12 +334,9 @@ function SholatView({ onBack }: { onBack: () => void }) {
 }
 
 function ProfileView({ onBack }: { onBack: () => void }) {
-  const { currentUserUid, users, updateProfile, globalVynaaKey, setGlobalVynaaKey, logout } = useAppStore();
+  const { currentUserUid, users, updateProfile, logout } = useAppStore();
   const user = currentUserUid ? users[currentUserUid] : null;
   const t = useTranslation(user?.language) as any;
-  
-  const [apiKeyInput, setApiKeyInput] = useState(globalVynaaKey);
-  const [isChecking, setIsChecking] = useState(false);
   
   const [cachedCount, setCachedCount] = useState(0);
 
@@ -360,23 +349,6 @@ function ProfileView({ onBack }: { onBack: () => void }) {
     const c = await countAudioCache();
     setCachedCount(c);
     toast.success('Cache audio berhasil dihapus!');
-  };
-
-  const handleSaveKey = async () => {
-    if (!apiKeyInput) {
-       setGlobalVynaaKey('');
-       toast.success('API Key dihapus.');
-       return;
-    }
-    setIsChecking(true);
-    const valid = await checkVynaaKey(apiKeyInput);
-    setIsChecking(false);
-    if (valid) {
-      setGlobalVynaaKey(apiKeyInput);
-      toast.success('API Key VYNAA aktif!');
-    } else {
-      toast.error('API Key gagal / tidak valid');
-    }
   };
 
   return (
@@ -398,28 +370,6 @@ function ProfileView({ onBack }: { onBack: () => void }) {
                 onChange={e => updateProfile({ name: e.target.value })}
                 className="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-4 py-3 text-lg font-bold text-gray-800 focus:outline-none focus:border-[var(--primary-color)] transition-colors"
               />
-            </div>
-            
-            <div className="pt-4 border-t-2 border-dashed border-gray-200">
-              <label className="block text-sm font-bold text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                <Key size={16}/> API Key VYNAA TTS
-              </label>
-              <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  value={apiKeyInput}
-                  onChange={e => setApiKeyInput(e.target.value)}
-                  placeholder="Masukkan API Key"
-                  className="flex-1 bg-gray-50 border-2 border-gray-200 rounded-2xl px-4 py-2 text-sm font-bold text-gray-800 focus:outline-none focus:border-[var(--primary-color)]"
-                />
-                <button 
-                  onClick={handleSaveKey}
-                  disabled={isChecking}
-                  className="bg-blue-500 text-white px-4 rounded-xl font-bold shadow hover:bg-blue-600 disabled:opacity-50"
-                >
-                  {isChecking ? 'Cek...' : 'Simpan'}
-                </button>
-              </div>
             </div>
 
             <div className="pt-4 border-t-2 border-dashed border-gray-200">
@@ -496,9 +446,9 @@ export default function App() {
 
   if (!currentUserUid) {
     const kids = [
-      { uid: 'abeel', name: 'Abeel', color: 'bg-blue-500', emoji: '🧑' },
-      { uid: 'emier', name: 'Emier', color: 'bg-green-500', emoji: '🧑' },
-      { uid: 'emily', name: 'emily', color: 'bg-pink-500', emoji: '👧' }
+      { uid: 'abeel', name: 'Abeel', color: 'bg-blue-500 border-blue-700', emoji: '🧑' },
+      { uid: 'emier', name: 'Emier', color: 'bg-green-500 border-green-700', emoji: '🧑' },
+      { uid: 'emily', name: 'emily', color: 'bg-pink-500 border-pink-700', emoji: '👧' }
     ];
 
     return (
@@ -527,8 +477,7 @@ export default function App() {
                    onClick={() => login(kid.uid, kid.name)}
                    className={cn(
                      "flex flex-col items-center justify-center p-8 rounded-3xl text-white shadow-xl border-b-[8px] active:border-b-0 active:translate-y-2 transition-all group",
-                     kid.color,
-                     kid.color.replace('bg-', 'border-').replace('500', '700')
+                     kid.color
                    )}
                  >
                    <span className="text-6xl mb-4 group-hover:scale-110 transition-transform">{kid.emoji}</span>

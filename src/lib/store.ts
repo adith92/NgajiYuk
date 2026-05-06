@@ -10,7 +10,6 @@ export interface UserProfile {
   theme: Theme;
   language: Language;
   avatarId?: string;
-  vynaaApiKey?: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -26,7 +25,6 @@ interface AppState {
   users: Record<string, UserProfile>;
   progress: Record<string, Record<string, Progress>>; // uid -> moduleId -> Progress
   currentUserUid: string | null;
-  globalVynaaKey: string;
   isReady: boolean;
   
   // Actions
@@ -37,7 +35,6 @@ interface AppState {
   updateProgress: (moduleId: string, itemId: string, pointsGained: number) => void;
   setTheme: (theme: Theme) => void;
   setLanguage: (lang: Language) => void;
-  setGlobalVynaaKey: (key: string) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -46,7 +43,6 @@ export const useAppStore = create<AppState>()(
       users: {},
       progress: {},
       currentUserUid: null,
-      globalVynaaKey: '',
       isReady: false,
 
       initializeApp: () => {
@@ -135,10 +131,6 @@ export const useAppStore = create<AppState>()(
 
       setLanguage: (language) => {
         get().updateProfile({ language });
-      },
-
-      setGlobalVynaaKey: (key) => {
-         set({ globalVynaaKey: key });
       }
     }),
     {
