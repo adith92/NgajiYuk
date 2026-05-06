@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/vynaa-api/:path*",
+      "destination": "https://vynaa.web.id/:path*"
+    }
+  ]
+}

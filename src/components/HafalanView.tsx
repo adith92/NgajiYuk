@@ -1,63 +1,113 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAppStore } from '../lib/store';
 import { useTranslation } from '../lib/i18n';
-import { ayatData } from '../lib/data';
+import { surahData } from '../data/surah';
 import { Header } from './Header';
 import { motion } from 'motion/react';
 import { Play, Pause, Repeat, FastForward } from 'lucide-react';
+import { getAudioFromCache, saveAudioToCache } from '../lib/audioCache';
+import { generateTtsAudio } from '../lib/vynaa';
+import toast from 'react-hot-toast';
 
 function cnHelper(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(' ');
 }
 
 export function HafalanView({ onBack }: { onBack: () => void }) {
-  const { user, progress, updateProgress } = useAppStore();
+  const { currentUserUid, users, globalVynaaKey } = useAppStore();
+  const user = currentUserUid ? users[currentUserUid] : null;
   const t = useTranslation(user?.language) as any;
-  const [selectedAyatId, setSelectedAyatId] = useState(ayatData[0].id);
+  const [selectedAyatId, setSelectedAyatId] = useState(surahData[0].id);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [loop, setLoop] = useState(false);
   
-  const synthRef = useRef<SpeechSynthesis>(window.speechSynthesis);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const selectedAyat = ayatData.find(a => a.id === selectedAyatId) || ayatData[0];
+  const selectedAyat = surahData.find(a => a.id === selectedAyatId) || surahData[0];
 
   useEffect(() => {
     return () => {
-      synthRef.current.cancel();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
     };
   }, []);
 
-  const handlePlayToggle = () => {
+  const handlePlayToggle = async () => {
     if (isPlaying) {
-      synthRef.current.cancel();
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
       setIsPlaying(false);
     } else {
-      playAyat();
+      await playAyat();
     }
   };
 
-  const playAyat = () => {
-    synthRef.current.cancel();
-    const msg = new SpeechSynthesisUtterance(selectedAyat.arabic);
-    msg.lang = 'ar-SA';
-    msg.rate = speed;
-    msg.onend = () => {
-      if (loop) {
-        setTimeout(playAyat, 500);
-      } else {
+  const playAyat = async () => {
+    if (audioRef.current) {
+        audioRef.current.pause();
+    }
+    
+    if (!globalVynaaKey) {
+        toast.error('API Key VYNAA belum diatur. Set di Profile untuk memutar audio!');
+        return;
+    }
+
+    const cacheKey = `surah_${selectedAyat.id}`;
+    let blob = await getAudioFromCache(cacheKey);
+    if (!blob) {
+       toast.loading('Loading audio...', { id: 'tts-load' });
+       try {
+         blob = await generateTtsAudio({ text: selectedAyat.audioText, lang: 'ar', apiKey: globalVynaaKey });
+         await saveAudioToCache(cacheKey, blob);
+         toast.dismiss('tts-load');
+       } catch (err) {
+         toast.error('Gagal generate audio', { id: 'tts-load' });
+         return;
+       }
+    }
+
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audioRef.current = audio;
+
+    audio.playbackRate = speed;
+    audio.loop = loop;
+    
+    audio.onended = () => {
+      URL.revokeObjectURL(url);
+      if (!audio.loop) {
         setIsPlaying(false);
       }
     };
-    msg.onstart = () => setIsPlaying(true);
-    synthRef.current.speak(msg);
+    
+    audio.onplay = () => setIsPlaying(true);
+    audio.onpause = () => setIsPlaying(false);
+
+    try {
+      await audio.play();
+    } catch (err) {
+      console.error(err);
+      setIsPlaying(false);
+    }
   };
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = speed;
+      audioRef.current.loop = loop;
+    }
+  }, [speed, loop]);
 
   useEffect(() => {
     if (isPlaying) {
       playAyat();
     }
-  }, [speed, selectedAyatId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAyatId]);
 
   return (
     <div className="flex-1 pb-10">
@@ -71,8 +121,8 @@ export function HafalanView({ onBack }: { onBack: () => void }) {
               value={selectedAyatId}
               onChange={(e) => setSelectedAyatId(e.target.value)}
             >
-              {ayatData.map(a => (
-                <option key={a.id} value={a.id}>{a.surah} - Ayat {a.ayat}</option>
+              {surahData.map(a => (
+                <option key={a.id} value={a.id}>{a.title}</option>
               ))}
             </select>
           </div>
@@ -85,7 +135,7 @@ export function HafalanView({ onBack }: { onBack: () => void }) {
                 transition={{ repeat: Infinity, duration: 1.5 / speed }}
               />
             )}
-            <div className="relative z-10 w-full">
+            <div className="relative z-10 w-full p-4">
               <p className="text-4xl md:text-5xl font-black text-right leading-relaxed text-gray-800" dir="rtl">
                 {selectedAyat.arabic}
               </p>
@@ -93,10 +143,8 @@ export function HafalanView({ onBack }: { onBack: () => void }) {
           </div>
 
           <div className="bg-gray-50 p-4 rounded-2xl mb-6">
-            <p className="text-xl font-bold text-gray-800 text-center mb-2">
-              {((selectedAyat.translation as any)[user?.language || 'id'])}
-            </p>
-            <p className="text-gray-500 italic text-center text-sm">{selectedAyat.latin}</p>
+             <p className="text-xl font-bold text-gray-800 text-center mb-2">{selectedAyat.translation}</p>
+             <p className="text-gray-500 italic text-center text-sm">{selectedAyat.latin}</p>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
@@ -118,7 +166,7 @@ export function HafalanView({ onBack }: { onBack: () => void }) {
                 loop ? "bg-blue-100 border-blue-500 text-blue-600 shadow-md" : "bg-gray-50 border-gray-200 text-gray-500"
               )}
             >
-              <Repeat variant={loop ? 'bold' : 'linear'} className="w-5 h-5" />
+              <Repeat className="w-5 h-5" />
               {t.loop}
             </button>
 

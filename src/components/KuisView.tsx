@@ -5,22 +5,25 @@ import { hijaiyahData } from '../lib/data';
 import { Header } from './Header';
 import { motion, AnimatePresence } from 'motion/react';
 import { Volume2, Trophy } from 'lucide-react';
+import { playAudio } from '../lib/audioCache';
+import confetti from 'canvas-confetti';
 
 function cnHelper(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-const playAudioFallback = (url: string, name: string, lang: string) => {
-  const audio = new Audio(url);
-  audio.play().catch(() => {
-    const msg = new SpeechSynthesisUtterance(name);
-    msg.lang = lang;
-    window.speechSynthesis.speak(msg);
+function triggerConfetti() {
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { y: 0.6 },
+    colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899']
   });
-};
+}
 
 export function KuisView({ onBack }: { onBack: () => void }) {
-  const { user, updateProgress } = useAppStore();
+  const { currentUserUid, users, updateProgress, globalVynaaKey } = useAppStore();
+  const user = currentUserUid ? users[currentUserUid] : null;
   const t = useTranslation(user?.language) as any;
   const [options, setOptions] = useState<any[]>([]);
   const [target, setTarget] = useState<any>(null);
@@ -43,9 +46,8 @@ export function KuisView({ onBack }: { onBack: () => void }) {
 
   const announceTarget = (char: any) => {
     if (!char) return;
-    const name = user?.language === 'ja' ? char.jp : char.name;
-    const lang = user?.language === 'ja' ? 'ja-JP' : 'id-ID';
-    playAudioFallback(char.audioUrl, name, lang);
+    const name = char.name; // ID/AR fallback handled via text
+    playAudio(`hijaiyah_kuis_${char.id}`, `Temukan huruf ${name}`, 'id', globalVynaaKey);
   };
 
   useEffect(() => {
@@ -60,18 +62,14 @@ export function KuisView({ onBack }: { onBack: () => void }) {
        setStatus('correct');
        setMessage(t.correct);
        updateProgress('kuis_hijaiyah', Date.now().toString(), 15);
-       
-       const msg = new SpeechSynthesisUtterance(t.correct);
-       msg.lang = user?.language === 'ja' ? 'ja-JP' : 'id-ID';
-       window.speechSynthesis.speak(msg);
+       triggerConfetti();
+       playAudio('kuis_correct', t.correct, 'id', globalVynaaKey);
 
        setTimeout(generateQuiz, 2000);
     } else {
        setStatus('wrong');
        setMessage(t.wrong);
-       const msg = new SpeechSynthesisUtterance(t.wrong);
-       msg.lang = user?.language === 'ja' ? 'ja-JP' : 'id-ID';
-       window.speechSynthesis.speak(msg);
+       playAudio('kuis_wrong', t.wrong, 'id', globalVynaaKey);
 
        setTimeout(() => {
          setStatus('playing');
@@ -84,14 +82,14 @@ export function KuisView({ onBack }: { onBack: () => void }) {
     <div className="flex-1 pb-10 flex flex-col">
       <Header title={t.menu_kuis} onBack={onBack} />
       
-      <div className="flex-1 flex flex-col items-center justify-center p-4 max-w-2xl mx-auto w-full">
+      <div className="flex-1 flex flex-col items-center justify-center p-4 max-w-2xl mx-auto w-full mt-4">
         
         <div className="mb-8 text-center bg-white p-6 rounded-3xl shadow-lg border-b-4 border-[var(--primary-color)] w-full relative">
-          <h3 className="text-2xl font-black text-gray-800 mb-4 uppercase tracking-wider">{t.guess_letter}</h3>
+          <h3 className="text-xl md:text-2xl font-black text-gray-800 mb-6 uppercase tracking-wider">{t.guess_letter}</h3>
           
           <button 
             onClick={() => announceTarget(target)}
-            className="w-24 h-24 bg-blue-100 text-blue-500 rounded-full mx-auto flex items-center justify-center shadow-inner hover:bg-blue-200 active:scale-95 transition-all group"
+            className="w-24 h-24 bg-blue-100 text-blue-500 rounded-full mx-auto flex items-center justify-center shadow-inner hover:bg-blue-200 active:scale-95 transition-all group border-4 border-white"
           >
             <Volume2 size={48} className="group-hover:scale-110 transition-transform" />
           </button>
@@ -103,7 +101,7 @@ export function KuisView({ onBack }: { onBack: () => void }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 className={cnHelper(
-                  "absolute -bottom-6 left-1/2 -translate-x-1/2 px-6 py-2 rounded-full font-bold text-white shadow-xl flex items-center gap-2",
+                  "absolute -bottom-6 left-1/2 -translate-x-1/2 px-6 py-2 rounded-full font-bold text-white shadow-xl flex items-center gap-2 whitespace-nowrap",
                   status === 'correct' ? "bg-green-500" : "bg-red-500"
                 )}
               >
@@ -114,7 +112,7 @@ export function KuisView({ onBack }: { onBack: () => void }) {
           </AnimatePresence>
         </div>
 
-        <div className="grid grid-cols-2 gap-6 w-full">
+        <div className="grid grid-cols-2 gap-4 md:gap-6 w-full">
           {options.map((opt, i) => (
             <motion.button
               key={i + opt.id}
@@ -132,7 +130,7 @@ export function KuisView({ onBack }: { onBack: () => void }) {
               )}
             >
               <span className="text-7xl md:text-8xl font-black text-white drop-shadow-md Arabic-Font" style={{ fontFamily: 'sans-serif' }}>
-                {opt.label}
+                {opt.arabic}
               </span>
               <div className="absolute inset-0 bg-white/20 opacity-0 hover:opacity-100 transition-opacity" />
             </motion.button>
