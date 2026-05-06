@@ -36,14 +36,14 @@ service cloud.firestore {
       allow create: if isOwner(userId)
         && isValidId(userId)
         && isValidUserProfile(incoming(), userId)
-        && incoming().createdAt == request.time.toMillis()
-        && incoming().updatedAt == request.time.toMillis();
+        && incoming().createdAt <= request.time.toMillis() + 60000
+        && incoming().updatedAt <= request.time.toMillis() + 60000;
       
       allow update: if isOwner(userId)
         && isValidUserProfile(incoming(), userId)
         && incoming().uid == existing().uid
         && incoming().createdAt == existing().createdAt
-        && incoming().updatedAt == request.time.toMillis()
+        && incoming().updatedAt <= request.time.toMillis() + 60000
         && (
            incoming().diff(existing()).affectedKeys().hasOnly(['name', 'theme', 'language', 'avatarId', 'updatedAt'])
         );
@@ -69,12 +69,12 @@ service cloud.firestore {
           && isValidId(moduleId)
           && exists(/databases/$(database)/documents/users/$(userId))
           && isValidProgress(incoming(), moduleId)
-          && incoming().updatedAt == request.time.toMillis();
+          && incoming().updatedAt <= request.time.toMillis() + 60000;
           
         allow update: if isOwner(userId)
           && isValidProgress(incoming(), moduleId)
           && incoming().moduleId == existing().moduleId
-          && incoming().updatedAt == request.time.toMillis()
+          && incoming().updatedAt <= request.time.toMillis() + 60000
           && (
              incoming().diff(existing()).affectedKeys().hasOnly(['completedItems', 'points', 'updatedAt'])
           );

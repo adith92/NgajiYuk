@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react';
 import { useAppStore } from './lib/store';
 import { useTranslation } from './lib/i18n';
 import { motion, AnimatePresence } from 'motion/react';
-import { BookOpen, Star, User, Settings, Check, ArrowLeft, Volume2, Gamepad2, Settings as SettingsIcon } from 'lucide-react';
+import { BookOpen, Star, User, Check, Volume2, Gamepad2, Headphones, Sparkles } from 'lucide-react';
 import { hijaiyahData, doaData, sholatData } from './lib/data';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { Header } from './components/Header';
+import { HafalanView } from './components/HafalanView';
+import { KuisView } from './components/KuisView';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -13,17 +16,17 @@ function cn(...inputs: ClassValue[]) {
 
 function MainMenu({ setView }: { setView: (v: string) => void }) {
   const { user, progress } = useAppStore();
-  const t = useTranslation(user?.language);
+  const t = useTranslation(user?.language) as any;
 
   const totalPoints = Object.values(progress).reduce((acc, curr) => acc + curr.points, 0);
 
   return (
-    <div className="flex flex-col items-center justify-center p-6 space-y-8 flex-1 min-h-screen">
+    <div className="flex flex-col items-center justify-center p-6 space-y-8 flex-1 min-h-[calc(100vh-80px)]">
       <motion.div 
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', bounce: 0.5 }}
-        className="text-center"
+        className="text-center mt-8"
       >
         <h1 className="text-5xl md:text-6xl font-black text-[var(--primary-color)] drop-shadow-md tracking-tight">
           {t.title}
@@ -35,11 +38,13 @@ function MainMenu({ setView }: { setView: (v: string) => void }) {
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-3xl pb-10">
         <MenuCard onClick={() => setView('hijaiyah')} color="bg-pink-500" title={t.menu_hijaiyah} icon={<Gamepad2 size={40} />} delay={0.1} />
-        <MenuCard onClick={() => setView('doa')} color="bg-blue-500" title={t.menu_doa} icon={<BookOpen size={40} />} delay={0.2} />
-        <MenuCard onClick={() => setView('sholat')} color="bg-green-500" title={t.menu_sholat} icon={<Star size={40} />} delay={0.3} />
-        <MenuCard onClick={() => setView('profile')} color="bg-purple-500" title={t.menu_profile} icon={<User size={40} />} delay={0.4} />
+        <MenuCard onClick={() => setView('kuis')} color="bg-rose-500" title={t.menu_kuis} icon={<Sparkles size={40} />} delay={0.2} />
+        <MenuCard onClick={() => setView('hafalan')} color="bg-teal-500" title={t.menu_hafalan} icon={<Headphones size={40} />} delay={0.3} />
+        <MenuCard onClick={() => setView('doa')} color="bg-blue-500" title={t.menu_doa} icon={<BookOpen size={40} />} delay={0.4} />
+        <MenuCard onClick={() => setView('sholat')} color="bg-green-500" title={t.menu_sholat} icon={<Star size={40} />} delay={0.5} />
+        <MenuCard onClick={() => setView('profile')} color="bg-purple-500" title={t.menu_profile} icon={<User size={40} />} delay={0.6} />
       </div>
     </div>
   );
@@ -55,27 +60,16 @@ function MenuCard({ onClick, title, icon, color, delay }: any) {
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
       className={cn(
-        "p-6 rounded-3xl shadow-xl flex flex-col items-center justify-center gap-4 text-white font-bold text-2xl h-48 border-b-8 active:border-b-0 active:translate-y-2 transition-all",
+        "p-4 rounded-3xl shadow-xl flex flex-col items-center justify-center gap-3 text-white font-bold text-center text-lg md:text-xl h-40 border-b-8 active:border-b-0 active:translate-y-2 transition-all",
         color,
         color.replace('bg-', 'border-').replace('500', '700')
       )}
     >
-      <div className="bg-white/20 p-4 rounded-full">
+      <div className="bg-white/20 p-3 rounded-full">
         {icon}
       </div>
-      {title}
+      <span className="leading-tight">{title}</span>
     </motion.button>
-  );
-}
-
-function Header({ title, onBack }: { title: string, onBack: () => void }) {
-  return (
-    <div className="flex items-center p-4 bg-white/50 backdrop-blur shadow-sm sticky top-0 z-10">
-      <button onClick={onBack} className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
-        <ArrowLeft className="text-[var(--primary-color)]" size={24} />
-      </button>
-      <h2 className="text-2xl font-black text-gray-800 ml-4 flex-1 text-center pr-10">{title}</h2>
-    </div>
   );
 }
 
@@ -103,32 +97,6 @@ export default function App() {
     );
   }
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#eff6ff] p-6 text-center">
-        <motion.div 
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ type: 'spring', bounce: 0.5 }}
-        >
-          <div className="bg-white p-6 rounded-full inline-block shadow-lg mb-6">
-            <BookOpen size={64} className="text-blue-500" />
-          </div>
-          <h1 className="text-5xl font-black text-blue-500 drop-shadow-md mb-4">Ngaji Kids</h1>
-          <p className="text-xl text-gray-600 font-bold mb-8">Belajar Agama yang Menyenangkan!</p>
-          
-          <button 
-            onClick={signIn}
-            className="bg-blue-500 text-white px-8 py-4 rounded-full font-bold text-xl shadow-xl hover:bg-blue-600 hover:scale-105 transition-all active:scale-95 flex items-center gap-2 mx-auto"
-          >
-            <User />
-            Mulai Belajar
-          </button>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex-1 flex flex-col min-h-screen">
       <AnimatePresence mode="wait">
@@ -141,6 +109,8 @@ export default function App() {
         >
           {view === 'menu' && <MainMenu setView={setView} />}
           {view === 'hijaiyah' && <HijaiyahView onBack={() => setView('menu')} />}
+          {view === 'kuis' && <KuisView onBack={() => setView('menu')} />}
+          {view === 'hafalan' && <HafalanView onBack={() => setView('menu')} />}
           {view === 'profile' && <ProfileView onBack={() => setView('menu')} />}
           {view === 'doa' && <DoaView onBack={() => setView('menu')} />}
           {view === 'sholat' && <SholatView onBack={() => setView('menu')} />}
@@ -413,13 +383,6 @@ function ProfileView({ onBack }: { onBack: () => void }) {
                 })}
               </div>
             </div>
-            
-            <button
-               onClick={() => signOut(auth)}
-               className="w-full mt-6 bg-red-100 text-red-600 font-bold py-3 rounded-2xl border-2 border-red-200 active:scale-95 transition-transform"
-            >
-               Keluar (Sign Out)
-            </button>
           </div>
         </div>
       </div>

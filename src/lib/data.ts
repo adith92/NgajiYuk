@@ -43,3 +43,66 @@ export const sholatData = [
   { id: 'alfatihah', name: { id: 'Al-Fatihah', ja: 'アル・ファーティハ', bew: 'Al-Fatihah' }, arabic: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ...', latin: 'Bismillahir rahmanir rahim...' },
   { id: 'ruku', name: { id: 'Doa Ruku\'', ja: 'ルクー（お辞儀）', bew: 'Doa Ruku' }, arabic: 'سُبْحَانَ رَبِّيَ الْعَظِيمِ وَبِحَمْدِهِ', latin: 'Subhaana rabbiyal \'adhiimi wabihamdih (3x)' },
 ];
+
+export const ayatData = [
+  {
+    id: 'fatihah_1',
+    surah: 'Al-Fatihah',
+    ayat: 1,
+    arabic: 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ',
+    latin: 'Bismillāhir-raḥmānir-raḥīm',
+    translation: {
+      id: 'Dengan nama Allah Yang Maha Pengasih, Maha Penyayang.',
+      ja: '慈悲あまねく慈愛深きアッラーの御名において。',
+      bew: 'Dengan nama Allah yang Maha Pengasih sama Maha Penyayang.'
+    }
+  },
+  {
+    id: 'fatihah_2',
+    surah: 'Al-Fatihah',
+    ayat: 2,
+    arabic: 'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ',
+    latin: 'Al-ḥamdu lillāhi rabbil-\'ālamīn',
+    translation: {
+      id: 'Segala puji bagi Allah, Tuhan seluruh alam.',
+      ja: '万有の主、アッラーに讃えあれ。',
+      bew: 'Segala puji buat Allah, Tuhannya semesta alam.'
+    }
+  },
+  {
+    id: 'ikhlas_1',
+    surah: 'Al-Ikhlas',
+    ayat: 1,
+    arabic: 'قُلْ هُوَ اللَّهُ أَحَدٌ',
+    latin: 'Qul huwallāhu aḥad',
+    translation: {
+      id: 'Katakanlah (Muhammad), "Dialah Allah, Yang Maha Esa."',
+      ja: '言え、「かれはアッラー、唯一なる御方である。',
+      bew: 'Bilang (Muhammad), "Allah tuh Cuman Satu."'
+    }
+  },
+  {
+    id: 'falaq_1',
+    surah: 'Al-Falaq',
+    ayat: 1,
+    arabic: 'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ',
+    latin: 'Qul a\'ūżu birabbil-falaq',
+    translation: {
+      id: 'Katakanlah, "Aku berlindung kepada Tuhan yang menguasai subuh (fajar),',
+      ja: '言え、「黎明の主に御加護を祈る。',
+      bew: 'Bilang, "Aye berlindung sama Tuhannya waktu subuh,'
+    }
+  },
+  {
+    id: 'nas_1',
+    surah: 'An-Nas',
+    ayat: 1,
+    arabic: 'قُلْ أَعُوذُ بِرَبِّ النَّاسِ',
+    latin: 'Qul a\'ūżu birabbin-nās',
+    translation: {
+      id: 'Katakanlah, "Aku berlindung kepada Tuhannya manusia,',
+      ja: '言え、「人間の主に御加護を祈る。',
+      bew: 'Bilang, "Aye berlindung sama Tuhannya manusia,'
+    }
+  }
+];

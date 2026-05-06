@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { db, auth } from './firebase';
 import { doc, getDoc, setDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
-import { onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInAnonymously } from 'firebase/auth';
 
 export type Language = 'id' | 'ja' | 'bew';
 export type Theme = 'default' | 'ocean' | 'forest' | 'sunset' | 'galaxy' | 'candy' | 'sunshine' | 'royal';
@@ -75,7 +75,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
         set({ user: profile, progress, isReady: true });
       } else {
-        set({ user: null, progress: {}, isReady: true });
+        await signInAnonymously(auth);
       }
     });
   },
