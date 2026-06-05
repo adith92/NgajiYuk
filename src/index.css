@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;950&family=Scheherazade+New:wght@400;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -55,14 +56,46 @@
   }
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   background-color: var(--bg-color, var(--color-bg-default));
-  transition: background-color 0.5s ease;
-  font-family: 'Nunito', sans-serif; /* A nice rounded font for kids */
+  transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+  color: #1f2937;
 }
 
 #root {
+  width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+img, svg, video, canvas, audio {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  color: inherit;
+}
+
+.Arabic-Font {
+  font-family: 'Scheherazade New', 'Lateef', 'Traditional Arabic', system-ui, sans-serif;
 }

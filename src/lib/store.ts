@@ -4,6 +4,27 @@ import { persist } from 'zustand/middleware';
 export type Language = 'id' | 'ja' | 'bew';
 export type Theme = 'default' | 'ocean' | 'forest' | 'sunset' | 'galaxy' | 'candy' | 'sunshine' | 'royal';
 
+export interface GameZoneUnlock {
+  unlocked: boolean;
+  startAt: number;
+  unlockUntil: number;
+  rewardMinutes: number;
+  rewardSource: 'quiz' | 'manual' | 'bonus';
+  reason: string;
+}
+
+export interface QuizHistory {
+  id: string;
+  moduleId: string;
+  totalQuestions: number;
+  correctAnswers: number;
+  wrongAnswers: number;
+  scorePercent: number;
+  passed: boolean;
+  rewardMinutes: number;
+  createdAt: number;
+}
+
 export interface UserProfile {
   uid: string;
   name: string;
@@ -27,6 +48,8 @@ interface AppState {
   currentUserUid: string | null;
   isReady: boolean;
   landingTheme: Theme;
+  rewardUnlocks: Record<string, GameZoneUnlock>; // uid -> GameZoneUnlock status
+  quizHistory: Record<string, QuizHistory[]>; // uid -> QuizHistory array
   
   // Actions
   initializeApp: () => void;
@@ -37,6 +60,10 @@ interface AppState {
   setTheme: (theme: Theme) => void;
   setLanguage: (lang: Language) => void;
   setLandingTheme: (theme: Theme) => void;
+  completeQuizSession: (moduleId: string, totalQuestions: number, correctAnswers: number, wrongAnswers: number) => QuizHistory;
+  unlockGameZone: (rewardMinutes: number, rewardSource: 'quiz' | 'manual' | 'bonus', reason: string) => void;
+  lockGameZone: () => void;
+  getGameZoneStatus: () => GameZoneUnlock | null;
 }
 
 export const useAppStore = create<AppState>()(
@@ -47,6 +74,8 @@ export const useAppStore = create<AppState>()(
       currentUserUid: null,
       isReady: false,
       landingTheme: 'default',
+      rewardUnlocks: {},
+      quizHistory: {},
 
       initializeApp: () => {
         set({ isReady: true });
@@ -150,6 +179,115 @@ export const useAppStore = create<AppState>()(
 
       setLandingTheme: (theme) => {
         set({ landingTheme: theme });
+      },
+
+      completeQuizSession: (moduleId, totalQuestions, correctAnswers, wrongAnswers) => {
+        const { currentUserUid, quizHistory } = get();
+        if (!currentUserUid) {
+          throw new Error("No active user");
+        }
+
+        const scorePercent = Math.round((correctAnswers / totalQuestions) * 100);
+        const passed = scorePercent >= 80;
+        let rewardMinutes = 0;
+        if (scorePercent === 100) {
+          rewardMinutes = 45;
+        } else if (scorePercent >= 90) {
+          rewardMinutes = 30;
+        } else if (scorePercent >= 80) {
+          rewardMinutes = 15;
+        }
+
+        const newSessionId = `${moduleId}_${Date.now()}`;
+        const newHistoryItem: QuizHistory = {
+          id: newSessionId,
+          moduleId,
+          totalQuestions,
+          correctAnswers,
+          wrongAnswers,
+          scorePercent,
+          passed,
+          rewardMinutes,
+          createdAt: Date.now()
+        };
+
+        const userHistory = quizHistory[currentUserUid] || [];
+        set({
+          quizHistory: {
+            ...quizHistory,
+            [currentUserUid]: [newHistoryItem, ...userHistory]
+          }
+        });
+
+        if (rewardMinutes > 0) {
+          get().unlockGameZone(rewardMinutes, 'quiz', `Skor kuis ${scorePercent}%`);
+        }
+
+        return newHistoryItem;
+      },
+
+      unlockGameZone: (rewardMinutes, rewardSource, reason) => {
+        const { currentUserUid, rewardUnlocks } = get();
+        if (!currentUserUid) return;
+
+        const startAt = Date.now();
+        const unlockUntil = startAt + (rewardMinutes * 60 * 1000);
+
+        const newStatus: GameZoneUnlock = {
+          unlocked: true,
+          startAt,
+          unlockUntil,
+          rewardMinutes,
+          rewardSource,
+          reason
+        };
+
+        set({
+          rewardUnlocks: {
+            ...rewardUnlocks,
+            [currentUserUid]: newStatus
+          }
+        });
+      },
+
+      lockGameZone: () => {
+        const { currentUserUid, rewardUnlocks } = get();
+        if (!currentUserUid) return;
+
+        const currentStatus = rewardUnlocks[currentUserUid];
+        const newStatus: GameZoneUnlock = {
+          unlocked: false,
+          startAt: currentStatus?.startAt || 0,
+          unlockUntil: 0,
+          rewardMinutes: 0,
+          rewardSource: currentStatus?.rewardSource || 'manual',
+          reason: 'Terkunci'
+        };
+
+        set({
+          rewardUnlocks: {
+            ...rewardUnlocks,
+            [currentUserUid]: newStatus
+          }
+        });
+      },
+
+      getGameZoneStatus: () => {
+        const { currentUserUid, rewardUnlocks } = get();
+        if (!currentUserUid) return null;
+
+        const status = rewardUnlocks[currentUserUid];
+        if (!status) return null;
+
+        if (status.unlocked && Date.now() > status.unlockUntil) {
+          // expired! automatic lock
+          get().lockGameZone();
+          return {
+            ...status,
+            unlocked: false,
+          };
+        }
+        return status;
       }
     }),
     {

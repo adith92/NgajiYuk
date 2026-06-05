@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAppStore } from './lib/store';
-import { useTranslation } from './lib/i18n';
+import { useTranslation, translations } from './lib/i18n';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, Star, User, Check, Volume2, Gamepad2, Headphones, Sparkles, Download, Trash2, Key, LogOut } from 'lucide-react';
 import { hijaiyahData } from './data/hijaiyah';
@@ -12,6 +12,8 @@ import { twMerge } from 'tailwind-merge';
 import { Header } from './components/Header';
 import { HafalanView } from './components/HafalanView';
 import { KuisView } from './components/KuisView';
+import { HeroMascot } from './components/HeroMascot';
+import { GameZoneView } from './components/GameZoneView';
 import { countAudioCache, clearAudioCache, playAudio, fetchAndCacheAudio } from './lib/audioCache';
 import toast, { Toaster } from 'react-hot-toast';
 import confetti from 'canvas-confetti';
@@ -30,7 +32,7 @@ function triggerConfetti() {
 }
 
 function MainMenu({ setView }: { setView: (v: string) => void }) {
-  const { currentUserUid, users, progress } = useAppStore();
+  const { currentUserUid, users, progress, getGameZoneStatus } = useAppStore();
   const user = currentUserUid ? users[currentUserUid] : null;
   const t = useTranslation(user?.language) as any;
   const userProgress = currentUserUid ? (progress[currentUserUid] || {}) : {};
@@ -45,6 +47,9 @@ function MainMenu({ setView }: { setView: (v: string) => void }) {
   useEffect(() => {
     countAudioCache().then(setCachedCount);
   }, []);
+
+  const gameZoneStatus = getGameZoneStatus();
+  const isGameZoneUnlocked = gameZoneStatus?.unlocked;
 
   const startDownloadAll = async () => {
     const allRequests: {id: string, url: string}[] = [];
@@ -72,70 +77,120 @@ function MainMenu({ setView }: { setView: (v: string) => void }) {
     countAudioCache().then(setCachedCount);
   };
 
+  const kidEmoji = user?.uid === 'abeel' ? '🧑' : user?.uid === 'emier' ? '🧑' : '👧';
+  const displayKidName = user?.name ? user.name.charAt(0).toUpperCase() + user.name.slice(1) : '';
+
   return (
-    <div className="flex flex-col items-center justify-center p-4 md:p-6 space-y-8 flex-1 min-h-[calc(100vh-80px)]">
+    <div className="w-full max-w-4xl mx-auto px-4 py-8 flex flex-col items-center flex-1 justify-start">
+      {/* Dynamic Welcoming Card Banner */}
       <motion.div 
-        initial={{ y: -50, opacity: 0 }}
+        initial={{ y: -30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ type: 'spring', bounce: 0.5 }}
-        className="text-center mt-8 w-full max-w-3xl"
+        transition={{ type: 'spring', bounce: 0.3 }}
+        className="w-full bg-white rounded-[2rem] shadow-xl p-6 md:p-8 border-4 border-white mb-8 overflow-hidden relative"
       >
-        <h1 className="text-5xl md:text-6xl font-black text-[var(--primary-color)] drop-shadow-md tracking-tight">
-          NgajiYuk!
-        </h1>
-        <div className="mt-4 inline-flex items-center gap-2 bg-yellow-100 text-yellow-600 px-6 py-2 rounded-full font-bold shadow-sm">
-          <Star className="fill-current" />
-          <span className="text-lg">{totalPoints} {t.points}</span>
-        </div>
-        
-        {!isDownloading && cachedCount === 0 && (
-          <div className="mt-6">
-            <button onClick={startDownloadAll} className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2 mx-auto hover:scale-105 active:scale-95 transition-all">
-               <Download size={20} />
-               Download Semua Audio Offline
-            </button>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--primary-color)]/5 rounded-full filter blur-2xl -translate-y-10 translate-x-10 pointer-events-none" />
+        <div className="flex flex-col md:flex-row items-center md:justify-between gap-6 text-center md:text-left relative z-10 w-full">
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <span className="text-5xl md:text-6xl bg-blue-50 p-3 rounded-2xl shadow-inner border border-blue-100 flex items-center justify-center select-none">{kidEmoji}</span>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-black text-gray-800 tracking-tight leading-tight">
+                Assalamu'alaikum, <span className="text-[var(--primary-color)]">{displayKidName}</span>! 👋
+              </h1>
+              <p className="text-gray-500 font-bold mt-1.5 text-sm md:text-base">
+                Siap belajar mengaji dengan menyenangkan hari ini? Nyok!
+              </p>
+            </div>
           </div>
-        )}
-        {isDownloading && (
-           <div className="mt-6 bg-white p-4 rounded-3xl shadow max-w-md mx-auto">
-             <p className="text-[var(--primary-color)] font-bold mb-2 text-center">Mengunduh {downloadProgress} / {totalDownload} audio...</p>
-             <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-               <div className="bg-blue-500 h-full transition-all duration-300" style={{ width: `${(downloadProgress / totalDownload) * 100}%` }}></div>
-             </div>
-           </div>
-        )}
+          
+          <div className="flex flex-col items-center justify-center gap-1 min-w-40 bg-yellow-400/10 border-2 border-yellow-400/30 p-4 rounded-3xl shrink-0">
+            <div className="flex items-center gap-1.5 text-yellow-600 bg-yellow-400/25 px-3 py-1 rounded-full text-xs font-black tracking-wide uppercase select-none">
+              <Star className="fill-yellow-500 stroke-yellow-600 w-3.5 h-3.5" />
+              <span>{t.points || "Poin Pinter"}</span>
+            </div>
+            <span className="text-3xl font-black text-yellow-600 tracking-tight">{totalPoints} p</span>
+          </div>
+        </div>
+
+        {/* Action Offline Audio Section inside the safe padding */}
+        <div className="mt-6 pt-6 border-t border-dashed border-gray-100 flex flex-col items-center w-full">
+          {!isDownloading && cachedCount === 0 && (
+            <button 
+              id="btn-download-audio"
+              onClick={startDownloadAll} 
+              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-extrabold py-3 px-6 rounded-2xl shadow-md flex items-center justify-center gap-2 text-xs md:text-sm active:scale-95 transition-all cursor-pointer border-b-4 border-indigo-700"
+            >
+              <Download size={18} />
+              Download Semua Audio untuk Belajar Offline
+            </button>
+          )}
+
+          {isDownloading && (
+            <div className="w-full max-w-sm bg-gray-50 border border-gray-100 p-4 rounded-2xl shadow-inner">
+              <p className="text-[var(--primary-color)] font-extrabold mb-2 text-center text-xs md:text-sm">
+                Mengunduh {downloadProgress} / {totalDownload} audio...
+              </p>
+              <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div 
+                  className="bg-blue-500 h-full rounded-full transition-all duration-300" 
+                  style={{ width: `${(downloadProgress / totalDownload) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {!isDownloading && cachedCount > 0 && (
+            <div className="text-xs bg-green-50 text-green-700 px-4 py-1.5 rounded-full font-extrabold flex items-center gap-1.5 border border-green-200 animate-pulse">
+              <span>🟢 {cachedCount} Audio terunduh, siap dipakai offline!</span>
+            </div>
+          )}
+        </div>
       </motion.div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-3xl pb-10">
-        <MenuCard onClick={() => setView('hijaiyah')} color="bg-pink-500 border-pink-700" title={t.menu_hijaiyah} icon={<Gamepad2 size={40} />} delay={0.1} />
-        <MenuCard onClick={() => setView('kuis')} color="bg-rose-500 border-rose-700" title={t.menu_kuis} icon={<Sparkles size={40} />} delay={0.2} />
-        <MenuCard onClick={() => setView('hafalan')} color="bg-teal-500 border-teal-700" title={t.menu_hafalan} icon={<Headphones size={40} />} delay={0.3} />
-        <MenuCard onClick={() => setView('doa')} color="bg-blue-500 border-blue-700" title={t.menu_doa} icon={<BookOpen size={40} />} delay={0.4} />
-        <MenuCard onClick={() => setView('sholat')} color="bg-green-500 border-green-700" title={t.menu_sholat} icon={<Star size={40} />} delay={0.5} />
-        <MenuCard onClick={() => setView('profile')} color="bg-purple-500 border-purple-700" title={t.menu_profile} icon={<User size={40} />} delay={0.6} />
+      {/* Structured, Bouncy and Evenly Spaced Menu Cards Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 w-full pb-10">
+        <MenuCard onClick={() => setView('hijaiyah')} color="bg-pink-500 border-pink-700 hover:bg-pink-400" title={t.menu_hijaiyah} icon={<Gamepad2 size={36} />} delay={0.05} />
+        <MenuCard onClick={() => setView('kuis')} color="bg-rose-500 border-rose-700 hover:bg-rose-400" title={t.menu_kuis} icon={<Sparkles size={36} />} delay={0.1} />
+        <MenuCard onClick={() => setView('hafalan')} color="bg-teal-500 border-teal-700 hover:bg-teal-400" title={t.menu_hafalan} icon={<Headphones size={36} />} delay={0.15} />
+        <MenuCard onClick={() => setView('doa')} color="bg-blue-500 border-blue-700 hover:bg-blue-400" title={t.menu_doa} icon={<BookOpen size={36} />} delay={0.2} />
+        <MenuCard onClick={() => setView('sholat')} color="bg-green-500 border-green-700 hover:bg-green-400" title={t.menu_sholat} icon={<Star size={36} />} delay={0.25} />
+        <MenuCard onClick={() => setView('profile')} color="bg-purple-500 border-purple-700 hover:bg-purple-400" title={t.menu_profile} icon={<User size={36} />} delay={0.3} />
+        {isGameZoneUnlocked ? (
+          <MenuCard onClick={() => setView('gamezone')} color="bg-orange-500 border-orange-700 hover:bg-orange-400" title="Game Zone 🎮" icon={<Gamepad2 size={36} />} delay={0.35} />
+        ) : (
+          <MenuCard 
+            id="locked-game-zone"
+            onClick={() => toast.error("Game Zone masih terkunci. Selesaikan kuis dengan nilai minimal 80 ya!", { icon: '🔒' })} 
+            color="bg-slate-300 border-slate-400 grayscale opacity-75 contrast-125" 
+            title="Game Zone 🔒" 
+            icon={<Gamepad2 size={36} className="text-slate-400" />} 
+            delay={0.35} 
+          />
+        )}
       </div>
     </div>
   );
 }
 
-function MenuCard({ color, title, icon, onClick, delay }: any) {
+function MenuCard({ color, title, icon, onClick, delay, id }: any) {
   return (
     <motion.button
+      id={id}
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay, type: 'spring' }}
+      transition={{ delay, type: 'spring', stiffness: 120 }}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
       className={cn(
-        "p-4 rounded-3xl shadow-xl flex flex-col items-center justify-center gap-3 text-white font-bold text-center text-lg md:text-xl h-40 border-b-8 active:border-b-0 active:translate-y-2 transition-all",
+        "p-4 rounded-[2rem] shadow-lg flex flex-col items-center justify-center gap-3 text-white font-extrabold text-center text-sm md:text-base h-36 border-b-8 active:border-b-active active:translate-y-1 hover:brightness-105 transition-all duration-150 cursor-pointer select-none overflow-hidden pb-5",
         color
       )}
     >
-      <div className="bg-white/20 p-3 rounded-full">
+      <div className="bg-white/20 p-2.5 rounded-2.5xl shadow-inner flex items-center justify-center">
         {icon}
       </div>
-      <span className="leading-tight">{title}</span>
+      <span className="leading-tight break-keep">{title}</span>
     </motion.button>
   );
 }
@@ -334,7 +389,7 @@ function SholatView({ onBack }: { onBack: () => void }) {
 }
 
 function ProfileView({ onBack, onLogout }: { onBack: () => void, onLogout: () => void }) {
-  const { currentUserUid, users, updateProfile, logout } = useAppStore();
+  const { currentUserUid, users, updateProfile, logout, quizHistory, getGameZoneStatus, lockGameZone } = useAppStore();
   const user = currentUserUid ? users[currentUserUid] : null;
   const t = useTranslation(user?.language) as any;
   
@@ -350,6 +405,12 @@ function ProfileView({ onBack, onLogout }: { onBack: () => void, onLogout: () =>
     setCachedCount(c);
     toast.success('Cache audio berhasil dihapus!');
   };
+
+  const userHistory = currentUserUid ? (quizHistory[currentUserUid] || []) : [];
+  const status = getGameZoneStatus();
+  const isUnlocked = status?.unlocked;
+  const lastQuiz = userHistory[0];
+  const totalQuizzes = userHistory.length;
 
   return (
     <div className="flex-1">
@@ -403,6 +464,56 @@ function ProfileView({ onBack, onLogout }: { onBack: () => void, onLogout: () =>
               </div>
             </div>
 
+            {/* Parent Control Block */}
+            <div className="pt-6 mt-6 border-t-2 border-dashed border-gray-200">
+              <label className="block text-sm font-black text-gray-500 uppercase tracking-widest mb-3">🔒 Parent Control</label>
+              
+              <div className="bg-gray-50 p-4 rounded-2xl border-2 border-gray-100 flex flex-col gap-3 text-sm">
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-gray-500">Status Game Zone:</span>
+                  {isUnlocked ? (
+                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full font-black text-xs flex items-center gap-1">
+                      🟢 Terbuka ({status ? Math.max(0, Math.ceil((status.unlockUntil - Date.now()) / 60000)) : 0} m)
+                    </span>
+                  ) : (
+                    <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full font-black text-xs">
+                      🔴 Terkunci
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex justify-between items-center border-t border-gray-100 pt-2">
+                  <span className="font-bold text-gray-500">Total Kuis Selesai:</span>
+                  <span className="font-extrabold text-gray-800">{totalQuizzes} Sesi</span>
+                </div>
+
+                {lastQuiz && (
+                  <div className="border-t border-gray-100 pt-2 space-y-1">
+                    <span className="font-bold text-gray-500 block mb-1">Kuis Terakhir:</span>
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-gray-600">Skor: <span className="font-bold">{lastQuiz.scorePercent}%</span></span>
+                      <span className="text-gray-600">Reward: <span className="font-bold text-blue-600">{lastQuiz.rewardMinutes} m</span></span>
+                      <span className={cn("font-bold px-2 py-0.5 rounded", lastQuiz.passed ? "text-green-600 bg-green-50" : "text-red-500 bg-red-50")}>
+                        {lastQuiz.passed ? "LULUS" : "GAGAL"}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {isUnlocked && (
+                  <button 
+                    onClick={() => {
+                      lockGameZone();
+                      toast.success("Game Zone dikunci manual!", { icon: '🔒' });
+                    }}
+                    className="w-full mt-2 bg-red-100 text-red-600 hover:bg-red-200 py-3 rounded-xl font-bold transition-all border border-red-200 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    🔒 Lock Game Zone Sekarang
+                  </button>
+                )}
+              </div>
+            </div>
+
             <div className="pt-6 mt-6 border-t-2 border-gray-200">
               <button 
                 onClick={() => {
@@ -431,10 +542,12 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
     setLandingTheme(localTheme);
   }, [localTheme, setLandingTheme]);
 
+  const defaultT = translations.id as any;
+
   const kids = [
-    { uid: 'abeel', name: 'Abeel', color: 'bg-blue-500 border-blue-700', emoji: '🧑' },
-    { uid: 'emier', name: 'Emier', color: 'bg-green-500 border-green-700', emoji: '🧑' },
-    { uid: 'emily', name: 'emily', color: 'bg-pink-500 border-pink-700', emoji: '👧' }
+    { uid: 'abeel', name: 'Abeel', color: 'bg-blue-500 border-blue-700 hover:bg-blue-400', emoji: '🧑' },
+    { uid: 'emier', name: 'Emier', color: 'bg-green-500 border-green-700 hover:bg-green-400', emoji: '🧑' },
+    { uid: 'emily', name: 'Emily', color: 'bg-pink-500 border-pink-700 hover:bg-pink-400', emoji: '👧' }
   ];
 
   const handleLogin = (uid: string, name: string) => {
@@ -443,67 +556,85 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 md:p-6 text-center select-none w-full max-w-4xl mx-auto">
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
+        initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="w-full max-w-3xl"
+        transition={{ type: 'spring', duration: 0.5 }}
+        className="w-full max-w-2xl px-2.5"
       >
-        <div className="bg-white p-6 md:p-10 rounded-[3rem] shadow-2xl border-4 border-white/50">
-          <div className="bg-blue-100 p-6 rounded-full inline-block mb-8 text-blue-500 shadow-inner">
-            <BookOpen size={64} />
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black text-gray-800 mb-6 tracking-tight">Siapa yang mau belajar?</h1>
+        <div className="bg-white p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl border-4 border-white text-center w-full relative overflow-hidden flex flex-col items-center">
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-400 via-orange-400 to-emerald-400" />
           
-          <div className="mb-8">
-            <h3 className="text-gray-500 font-bold uppercase tracking-wider mb-4 text-sm">Pilih Tema Dulu Yuk!</h3>
-            <div className="flex flex-wrap justify-center gap-2">
+          <HeroMascot />
+          
+          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6 tracking-tight leading-tight px-2">
+            Siapa yang mau belajar?
+          </h1>
+          
+          <div className="mb-8 w-full max-w-xl">
+            <h3 className="text-gray-400 font-extrabold uppercase tracking-widest mb-3.5 text-xs">Pilih Tema Dulu Yuk! 🎨</h3>
+            <div className="flex flex-wrap justify-center gap-2 px-1 max-w-md mx-auto">
               {['default', 'ocean', 'forest', 'sunset', 'galaxy', 'candy', 'sunshine', 'royal'].map(th => {
-                  const isActive = localTheme === th;
-                  return (
-                    <button
-                      key={th}
-                      onClick={() => setLocalTheme(th as any)}
-                      className={cn(
-                        "px-4 py-2 rounded-full font-bold transition-all border-2",
-                        isActive ? "border-[var(--primary-color)] bg-[var(--primary-color)] text-white" : "border-gray-200 text-gray-500 hover:bg-gray-50"
-                      )}
-                    >
-                      {th}
-                    </button>
-                  );
-                })}
+                const isActive = localTheme === th;
+                const activeBorderAndColor = `border-[var(--primary-color)] bg-[var(--primary-color)] text-white shadow-md scale-105`;
+                const inactiveBorderAndColor = `border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 hover:border-gray-300`;
+                
+                return (
+                  <button
+                    key={th}
+                    onClick={() => setLocalTheme(th as any)}
+                    className={cn(
+                      "px-3.5 py-1.5 text-xs md:text-sm rounded-full font-bold transition-all border-2 cursor-pointer select-none focus:outline-none flex items-center justify-center gap-1.5",
+                      isActive ? activeBorderAndColor : inactiveBorderAndColor
+                    )}
+                  >
+                    <span className={cn(
+                      "w-2.5 h-2.5 rounded-full shrink-0 border border-black/10 inline-block",
+                      th === 'default' ? 'bg-blue-400' :
+                      th === 'ocean' ? 'bg-cyan-400' :
+                      th === 'forest' ? 'bg-emerald-400' :
+                      th === 'sunset' ? 'bg-orange-400' :
+                      th === 'galaxy' ? 'bg-violet-400' :
+                      th === 'candy' ? 'bg-pink-400' :
+                      th === 'sunshine' ? 'bg-yellow-400' :
+                      'bg-indigo-400'
+                    )} />
+                    <span>{(defaultT)[`theme_${th}`] || th}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-5 w-full max-w-xl mt-2 px-1">
             {kids.map((kid, i) => (
               <motion.button
                 key={kid.uid}
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.1, type: 'spring', duration: 0.4 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleLogin(kid.uid, kid.name)}
                 className={cn(
-                  "flex flex-col items-center justify-center p-6 rounded-3xl text-white shadow-xl border-b-[8px] active:border-b-0 active:translate-y-2 transition-all group",
+                  "flex flex-col items-center justify-center p-4 md:p-6 rounded-3xl text-white shadow-lg border-b-[8px] active:border-b-active active:translate-y-1 hover:brightness-105 transition-all duration-150 cursor-pointer group h-36 focus:outline-none select-none",
                   kid.color
                 )}
               >
-                <span className="text-6xl mb-4 group-hover:scale-110 transition-transform">{kid.emoji}</span>
-                <span className="text-2xl font-black">{kid.name}</span>
+                <span className="text-5xl mb-2 group-hover:scale-110 transition-transform select-none">{kid.emoji}</span>
+                <span className="text-xl font-extrabold leading-none">{kid.name}</span>
               </motion.button>
             ))}
           </div>
 
           {currentUserUid && users[currentUserUid] && (
-             <div className="mt-8 pt-8 border-t-2 border-gray-100">
+             <div className="mt-8 pt-6 border-t-2 border-dashed border-gray-100 flex justify-center w-full max-w-xl">
                <button 
                  onClick={onEnter}
-                 className="bg-[var(--primary-color)] text-white px-8 py-4 rounded-3xl font-bold shadow-xl border-b-[8px] border-black/20 hover:scale-105 active:scale-95 active:border-b-0 active:translate-y-2 transition-all text-xl"
+                 className="bg-[var(--primary-color)] text-white px-6 py-3.5 rounded-2xl font-extrabold shadow-lg border-b-4 border-black/10 hover:scale-103 active:scale-97 active:border-b-0 active:translate-y-1 transition-all text-sm md:text-base flex items-center gap-2 cursor-pointer focus:outline-none"
                >
-                 Lanjut sebagai {users[currentUserUid].name} &rarr;
+                 Lanjut belajar sebagai <span className="underline font-black">{users[currentUserUid].name}</span> &rarr;
                </button>
              </div>
           )}
@@ -554,11 +685,12 @@ export default function App() {
           {view === 'landing' && <LandingPage onEnter={() => setView('menu')} />}
           {view === 'menu' && <MainMenu setView={setView} />}
           {view === 'hijaiyah' && <HijaiyahView onBack={() => setView('menu')} />}
-          {view === 'kuis' && <KuisView onBack={() => setView('menu')} />}
+          {view === 'kuis' && <KuisView onBack={() => setView('menu')} onGoToGameZone={() => setView('gamezone')} />}
           {view === 'hafalan' && <HafalanView onBack={() => setView('menu')} />}
           {view === 'profile' && <ProfileView onBack={() => setView('menu')} onLogout={() => setView('landing')} />}
           {view === 'doa' && <DoaView onBack={() => setView('menu')} />}
           {view === 'sholat' && <SholatView onBack={() => setView('menu')} />}
+          {view === 'gamezone' && <GameZoneView onBack={() => setView('menu')} />}
         </motion.div>
       </AnimatePresence>
     </div>
