@@ -63,14 +63,20 @@ function MainMenu({ setView }: { setView: (v: string) => void }) {
     setIsDownloading(true);
 
     let count = 0;
-    for (const req of allRequests) {
-      try {
-        await fetchAndCacheAudio(req.id, req.url);
-      } catch (err) {
-        console.error('Failed to download audio for:', req.id);
-      }
-      count++;
-      setDownloadProgress(count);
+    const batchSize = 10;
+    for (let i = 0; i < allRequests.length; i += batchSize) {
+      const batch = allRequests.slice(i, i + batchSize);
+      await Promise.all(
+        batch.map(async (req) => {
+          try {
+            await fetchAndCacheAudio(req.id, req.url);
+          } catch (err) {
+            console.error('Failed to download audio for:', req.id);
+          }
+          count++;
+          setDownloadProgress(Math.min(count, allRequests.length));
+        })
+      );
     }
     setIsDownloading(false);
     toast.success('Audio siap offline!');
@@ -183,7 +189,7 @@ function MenuCard({ color, title, icon, onClick, delay, id }: any) {
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
       className={cn(
-        "p-4 rounded-[2rem] shadow-lg flex flex-col items-center justify-center gap-3 text-white font-extrabold text-center text-sm md:text-base h-36 border-b-8 active:border-b-active active:translate-y-1 hover:brightness-105 transition-all duration-150 cursor-pointer select-none overflow-hidden pb-5",
+        "p-4 rounded-[2rem] clay-btn flex flex-col items-center justify-center gap-3 text-white font-extrabold text-center text-sm md:text-base h-36 hover:brightness-105 transition-all duration-150 cursor-pointer select-none overflow-hidden pb-5",
         color
       )}
     >
@@ -618,7 +624,7 @@ function LandingPage({ onEnter }: { onEnter: () => void }) {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleLogin(kid.uid, kid.name)}
                 className={cn(
-                  "flex flex-col items-center justify-center p-4 md:p-6 rounded-3xl text-white shadow-lg border-b-[8px] active:border-b-active active:translate-y-1 hover:brightness-105 transition-all duration-150 cursor-pointer group h-36 focus:outline-none select-none",
+                  "flex flex-col items-center justify-center p-4 md:p-6 rounded-3xl text-white clay-btn hover:brightness-105 transition-all duration-150 cursor-pointer group h-36 focus:outline-none select-none",
                   kid.color
                 )}
               >
