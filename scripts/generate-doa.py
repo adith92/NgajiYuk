@@ -4,7 +4,7 @@ import edge_tts
 
 VOICE = "ar-SA-ZariyahNeural"
 PITCH = "+30Hz"
-RATE = "-10%"
+RATE = "-50%"
 
 async def generate(text, output_path):
     if os.path.exists(output_path):
