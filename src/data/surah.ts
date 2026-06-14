@@ -1,13 +1,4 @@
-export interface SurahData {
-  id: string;
-  title: string;
-  arabic: string;
-  latin: string;
-  translation: string;
-  audioText: string;
-  audioUrl?: string;
-  needsReview?: boolean;
-}
+import { IslamicContentItem as SurahData } from '../types/models';
 
 export const surahData: SurahData[] = [
   {

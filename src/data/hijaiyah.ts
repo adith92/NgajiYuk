@@ -1,11 +1,4 @@
-export interface HijaiyahData {
-  id: string;
-  name: string;
-  arabic: string;
-  color: string;
-  audioUrl?: string; // fallback if needed
-  audioText: string;
-}
+import { HijaiyahItem as HijaiyahData } from '../types/models';
 
 export const hijaiyahData: HijaiyahData[] = [
   { id: 'alif', name: 'Alif', arabic: 'ا', color: 'bg-red-400', audioText: 'Alif' },

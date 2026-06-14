@@ -21,7 +21,10 @@ function triggerConfetti() {
   });
 }
 
-export function KuisView({ onBack, onGoToGameZone }: { onBack: () => void, onGoToGameZone: () => void }) {
+import { useNavigate } from 'react-router-dom';
+
+export function KuisView() {
+  const navigate = useNavigate();
   const { currentUserUid, users, updateProgress, completeQuizSession } = useAppStore();
   const user = currentUserUid ? users[currentUserUid] : null;
   const t = useTranslation(user?.language) as any;
@@ -63,6 +66,7 @@ export function KuisView({ onBack, onGoToGameZone }: { onBack: () => void, onGoT
       if (typeof window !== 'undefined' && window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
+      confetti.reset();
     };
   }, []);
 
@@ -133,7 +137,7 @@ export function KuisView({ onBack, onGoToGameZone }: { onBack: () => void, onGoT
     const isPassed = resultSummary.passed;
     return (
       <div className="flex-1 pb-10 flex flex-col">
-        <Header title={t.menu_kuis} onBack={onBack} />
+        <Header title={t.menu_kuis} onBack={() => navigate('/menu')} />
         <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-xl mx-auto w-full mt-4">
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
@@ -166,14 +170,14 @@ export function KuisView({ onBack, onGoToGameZone }: { onBack: () => void, onGoT
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <button
-                    onClick={onGoToGameZone}
-                    className="flex-1 bg-orange-500 text-white px-8 py-4 rounded-2xl font-black shadow-lg border-b-8 border-orange-700 active:border-b-0 active:translate-y-2 hover:scale-105 transition-all text-lg cursor-pointer"
+                    onClick={() => navigate('/gamezone')}
+                    className="flex-1 bg-orange-500 text-white px-8 py-4 rounded-2xl font-black shadow-lg hover:scale-105 transition-all text-lg cursor-pointer clay-btn"
                   >
                     🎮 Masuk Game Zone
                   </button>
                   <button
-                    onClick={onBack}
-                    className="flex-1 bg-gray-100 text-gray-700 hover:bg-gray-200 px-8 py-4 rounded-2xl font-black active:translate-y-1 transition-all text-lg cursor-pointer"
+                    onClick={() => navigate('/menu')}
+                    className="flex-1 bg-gray-200 text-gray-800 hover:bg-gray-300 px-8 py-4 rounded-2xl font-black transition-all text-lg cursor-pointer clay-btn"
                   >
                     Kembali ke Menu
                   </button>
@@ -199,13 +203,13 @@ export function KuisView({ onBack, onGoToGameZone }: { onBack: () => void, onGoT
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <button
                     onClick={resetQuiz}
-                    className="flex-1 bg-[var(--primary-color)] text-white px-8 py-4 rounded-2xl font-black shadow-lg border-b-8 border-blue-700 active:border-b-0 active:translate-y-2 hover:scale-105 transition-all text-lg cursor-pointer"
+                    className="flex-1 bg-[var(--primary-color)] text-white px-8 py-4 rounded-2xl font-black shadow-lg hover:scale-105 transition-all text-lg cursor-pointer clay-btn"
                   >
                     🔄 Ulangi Kuis
                   </button>
                   <button
-                    onClick={onBack}
-                    className="flex-1 bg-gray-100 text-gray-700 hover:bg-gray-200 px-8 py-4 rounded-2xl font-black active:translate-y-1 transition-all text-lg cursor-pointer"
+                    onClick={() => navigate('/menu')}
+                    className="flex-1 bg-gray-200 text-gray-800 hover:bg-gray-300 px-8 py-4 rounded-2xl font-black transition-all text-lg cursor-pointer clay-btn"
                   >
                     Kembali ke Menu
                   </button>
@@ -220,7 +224,7 @@ export function KuisView({ onBack, onGoToGameZone }: { onBack: () => void, onGoT
 
   return (
     <div className="flex-1 pb-10 flex flex-col">
-      <Header title={t.menu_kuis} onBack={onBack} />
+      <Header title={t.menu_kuis} onBack={() => navigate('/menu')} />
       
       <div className="flex-1 flex flex-col items-center justify-center p-4 max-w-2xl mx-auto w-full mt-4">
         
@@ -278,7 +282,7 @@ export function KuisView({ onBack, onGoToGameZone }: { onBack: () => void, onGoT
               onClick={() => handleGuess(opt)}
               disabled={status === 'correct' || status === 'wrong' || hasGuessed}
               className={cnHelper(
-                "aspect-square rounded-3xl shadow-xl flex items-center justify-center border-b-8 active:border-b-0 active:translate-y-2 transition-all overflow-hidden relative cursor-pointer",
+                "aspect-square rounded-3xl flex items-center justify-center transition-all overflow-hidden relative cursor-pointer clay-btn",
                 opt.color,
                 opt.color.replace('bg-', 'border-').replace('400', '600').replace('500', '700')
               )}

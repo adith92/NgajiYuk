@@ -1,6 +1,18 @@
 import { Language } from './store';
 
-export const translations = {
+export type TranslationKeys =
+  | 'loading' | 'title' | 'subtitle' | 'menu_hijaiyah' | 'menu_doa'
+  | 'menu_sholat' | 'menu_hafalan' | 'menu_kuis' | 'menu_profile'
+  | 'points' | 'btn_back' | 'btn_save' | 'settings' | 'play'
+  | 'pause' | 'speed' | 'loop' | 'select_ayat' | 'play_again'
+  | 'guess_letter' | 'correct' | 'wrong' | 'lang_id' | 'lang_ja'
+  | 'lang_bew' | 'theme_default' | 'theme_ocean' | 'theme_forest'
+  | 'theme_sunset' | 'theme_galaxy' | 'theme_candy' | 'theme_sunshine'
+  | 'theme_royal' | 'profile_name' | 'good_job';
+
+export type Translations = Record<TranslationKeys, string>;
+
+export const translations: Record<Language, Translations> = {
   id: {
     loading: 'Memuat...',
     title: 'Ngaji Kids',
@@ -114,6 +126,6 @@ export const translations = {
   }
 };
 
-export function useTranslation(lang: Language = 'id') {
+export function useTranslation(lang: Language = 'id'): Translations {
   return translations[lang] || translations.id;
 }

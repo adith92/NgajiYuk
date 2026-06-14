@@ -7,12 +7,14 @@ import { motion } from 'motion/react';
 import { Play, Pause, Repeat, FastForward } from 'lucide-react';
 import { fetchAndCacheAudio } from '../lib/audioCache';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 function cnHelper(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-export function HafalanView({ onBack }: { onBack: () => void }) {
+export default function HafalanView() {
+  const navigate = useNavigate();
   const { currentUserUid, users } = useAppStore();
   const user = currentUserUid ? users[currentUserUid] : null;
   const t = useTranslation(user?.language) as any;
@@ -100,8 +102,8 @@ export function HafalanView({ onBack }: { onBack: () => void }) {
   }, [selectedAyatId]);
 
   return (
-    <div className="flex-1 pb-10">
-      <Header title={t.menu_hafalan} onBack={onBack} />
+    <div className="flex-1 pb-10 flex flex-col">
+      <Header title={t.menu_hafalan} onBack={() => navigate('/menu')} />
       <div className="p-4 max-w-3xl mx-auto mt-6">
         <div className="bg-white p-6 rounded-3xl shadow-xl border-2 border-green-200">
           <div className="mb-6">

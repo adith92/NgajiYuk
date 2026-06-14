@@ -17,10 +17,10 @@ function triggerConfettiSpace() {
   });
 }
 
-export function GameZoneView({ onBack }: { onBack: () => void }) {
+export default function GameZoneView() {
+  const navigate = useNavigate();
   const { currentUserUid, users, getGameZoneStatus, lockGameZone } = useAppStore();
   const user = currentUserUid ? users[currentUserUid] : null;
-  const t = useTranslation(user?.language) as any;
 
   const [currentStatus, setCurrentStatus] = useState(() => getGameZoneStatus());
   const [timeLeftStr, setTimeLeftStr] = useState("00:00");
@@ -75,47 +75,65 @@ export function GameZoneView({ onBack }: { onBack: () => void }) {
     playAudio('game_tap', '/audio/kuis/correct.mp3');
   };
 
-  // 1. LOCKED VIEW
   if (!currentStatus || !currentStatus.unlocked) {
-    return (
-      <div className="flex-1 pb-10 flex flex-col">
-        <Header title="Game Zone terkunci" onBack={onBack} />
-        <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-xl mx-auto w-full mt-4">
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white p-8 md:p-10 rounded-[3rem] shadow-2xl border-4 border-white text-center w-full relative overflow-hidden"
-          >
-            <div className="absolute top-0 left-0 w-20 h-20 bg-gray-100 rounded-full filter blur-xl opacity-50 -translate-x-10 -translate-y-10" />
-            
-            <div className="w-24 h-24 bg-red-100 text-red-500 rounded-[2rem] mx-auto flex items-center justify-center shadow-lg mb-6 border-b-4 border-red-200">
-              <Lock size={48} className="animate-pulse" />
-            </div>
-
-            <h2 className="text-3xl font-black text-gray-800 mb-4 leading-tight">
-              Game Zone Terkunci 🔒
-            </h2>
-            
-            <p className="text-gray-500 font-medium mb-8 text-base">
-              Selesaikan kuis dengan nilai minimal <span className="font-bold text-blue-500">80%</span> untuk membuka waktu bermain yang seru!
-            </p>
-
-            <button
-              onClick={onBack}
-              className="w-full bg-[var(--primary-color)] text-white px-8 py-4 rounded-2xl font-black shadow-lg border-b-8 border-blue-700 active:border-b-0 active:translate-y-2 hover:scale-[1.02] transition-all text-lg cursor-pointer flex items-center justify-center gap-2"
-            >
-              <ArrowLeft size={20} /> Kembali Belajar
-            </button>
-          </motion.div>
-        </div>
-      </div>
-    );
+    return <LockedGameZone onBack={() => navigate('/menu')} />;
   }
 
-  // 2. PLAYING VIEW
   return (
-    <div className="flex-1 pb-10 flex flex-col min-h-screen">
-      <Header title="Game Zone 🎮" onBack={onBack} />
+    <ActiveGameZone
+      timeLeftStr={timeLeftStr}
+      score={score}
+      starPos={starPos}
+      bouncing={bouncing}
+      handleTapStar={handleTapStar}
+      lockGameZone={lockGameZone}
+      onBack={() => navigate('/menu')}
+    />
+  );
+}
+
+function LockedGameZone({ onBack }: { onBack: () => void }) {
+  return (
+    <div className="flex-1 pb-10 flex flex-col">
+      <Header title="Game Zone terkunci" onBack={onBack} />
+      <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-xl mx-auto w-full mt-4">
+        <motion.div 
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="bg-white p-8 md:p-10 rounded-[3rem] shadow-2xl border-4 border-white text-center w-full relative overflow-hidden"
+        >
+          <div className="absolute top-0 left-0 w-20 h-20 bg-gray-100 rounded-full filter blur-xl opacity-50 -translate-x-10 -translate-y-10" />
+          
+          <div className="w-24 h-24 bg-red-100 text-red-500 rounded-[2rem] mx-auto flex items-center justify-center shadow-lg mb-6 border-b-4 border-red-200">
+            <Lock size={48} className="animate-pulse" />
+          </div>
+
+          <h2 className="text-3xl font-black text-gray-800 mb-4 leading-tight">
+            Game Zone Terkunci 🔒
+          </h2>
+          
+          <p className="text-gray-500 font-medium mb-8 text-base">
+            Selesaikan kuis dengan nilai minimal <span className="font-bold text-blue-500">80%</span> untuk membuka waktu bermain yang seru!
+          </p>
+
+          <button
+            onClick={onBack}
+            className="w-full bg-[var(--primary-color)] text-white px-8 py-4 rounded-2xl font-black shadow-lg border-b-8 border-blue-700 active:border-b-0 active:translate-y-2 hover:scale-[1.02] transition-all text-lg cursor-pointer flex items-center justify-center gap-2"
+          >
+            <ArrowLeft size={20} /> Kembali Belajar
+          </button>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+function ActiveGameZone({ 
+  timeLeftStr, score, starPos, bouncing, handleTapStar, lockGameZone, onBack 
+}: any) {
+  return (
+    <div className="flex-1 pb-10 flex flex-col min-h-screen bg-gray-50">
+      <Header title="🎮 Game Zone" onBack={onBack} />
       
       <div className="max-w-4xl mx-auto w-full px-4 mt-4 flex-1 flex flex-col">
         
@@ -146,7 +164,6 @@ export function GameZoneView({ onBack }: { onBack: () => void }) {
         {/* Space Outer Boundary Play Field */}
         <div className="flex-1 min-h-[350px] relative bg-slate-900 rounded-[2.5rem] shadow-2xl border-4 border-white overflow-hidden flex flex-col justify-between p-4">
           
-          {/* Cosmic background details */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900 via-slate-900 to-black pointer-events-none" />
           <div className="absolute top-4 left-6 text-white/30 text-xs font-mono pointer-events-none flex items-center gap-1">
             <Sparkles size={12} className="animate-spin" /> AREA LUAR ANGKASA
@@ -155,7 +172,6 @@ export function GameZoneView({ onBack }: { onBack: () => void }) {
           <div className="absolute top-10 right-10 text-xl pointer-events-none animate-bounce">🌙</div>
           <div className="absolute bottom-10 left-12 text-sm pointer-events-none opacity-40">🪐</div>
 
-          {/* Interactive Tap Star */}
           <div className="absolute inset-0">
             <motion.button
               onClick={handleTapStar}
@@ -173,7 +189,6 @@ export function GameZoneView({ onBack }: { onBack: () => void }) {
             </motion.button>
           </div>
 
-          {/* Guide message */}
           <div className="w-full text-center text-white/60 pointer-events-none text-xs md:text-sm font-semibold tracking-wider uppercase py-2 bg-black/20 backdrop-blur-sm rounded-full mt-auto">
             Kejar dan Tap Bintang Emas untuk menambah skor! 🌟
           </div>

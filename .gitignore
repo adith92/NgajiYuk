@@ -6,3 +6,10 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Repowise reports
+.repowise/
+repowise_*.json
+repowise-output.txt
+repowise-output.md
+

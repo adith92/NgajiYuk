@@ -28,8 +28,20 @@ export async function getAudioFromCache(id: string): Promise<Blob | undefined> {
   return db.get(STORE_NAME, id);
 }
 
+const MAX_CACHE_ITEMS = 50;
+
 export async function saveAudioToCache(id: string, blob: Blob) {
   const db = await initDB();
+  
+  // Quota Management: delete oldest if exceeded
+  const count = await db.count(STORE_NAME);
+  if (count >= MAX_CACHE_ITEMS) {
+    const keys = await db.getAllKeys(STORE_NAME);
+    if (keys.length > 0) {
+      await db.delete(STORE_NAME, keys[0]);
+    }
+  }
+  
   await db.put(STORE_NAME, blob, id);
 }
 

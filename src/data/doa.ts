@@ -1,14 +1,4 @@
-export interface DoaData {
-  id: string;
-  title: string;
-  arabic: string;
-  latin: string;
-  translation: string;
-  audioText: string;
-  category?: string;
-  audioUrl?: string;
-  needsReview?: boolean;
-}
+import { IslamicContentItem as DoaData } from '../types/models';
 
 export const doaData: DoaData[] = [
   {
