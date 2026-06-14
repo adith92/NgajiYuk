@@ -1,23 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;950&family=Scheherazade+New:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Scheherazade+New:wght@400;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-primary-default: #3b82f6; /* blue-500 */
+  --color-primary-default: #10b981; /* emerald-500 */
   --color-primary-ocean: #06b6d4; /* cyan-500 */
-  --color-primary-forest: #22c55e; /* green-500 */
+  --color-primary-forest: #059669; /* emerald-600 */
   --color-primary-sunset: #f97316; /* orange-500 */
   --color-primary-galaxy: #8b5cf6; /* violet-500 */
   --color-primary-candy: #ec4899; /* pink-500 */
-  --color-primary-sunshine: #eab308; /* yellow-500 */
+  --color-primary-sunshine: #fbbf24; /* amber-400 (Warm Gold) */
   --color-primary-royal: #6366f1; /* indigo-500 */
 
-  --color-bg-default: #eff6ff; /* blue-50 */
+  --color-bg-default: #f0fdf4; /* emerald-50 (siang) */
   --color-bg-ocean: #ecfeff; /* cyan-50 */
-  --color-bg-forest: #f0fdf4; /* green-50 */
+  --color-bg-forest: #d1fae5; /* emerald-100 */
   --color-bg-sunset: #fff7ed; /* orange-50 */
   --color-bg-galaxy: #f5f3ff; /* violet-50 */
   --color-bg-candy: #fdf2f8; /* pink-50 */
-  --color-bg-sunshine: #fefce8; /* yellow-50 */
+  --color-bg-sunshine: #fffbeb; /* amber-50 */
   --color-bg-royal: #eef2ff; /* indigo-50 */
 }
 
@@ -74,8 +74,8 @@ html, body {
 body {
   background-color: var(--bg-color, var(--color-bg-default));
   transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  font-family: 'Nunito', system-ui, -apple-system, sans-serif;
-  color: #1f2937;
+  font-family: 'Fredoka', 'Nunito', system-ui, -apple-system, sans-serif;
+  color: #064e3b; /* Emerald tua agar readable */
 }
 
 #root {
@@ -100,18 +100,42 @@ button, input, select, textarea {
   font-family: 'Scheherazade New', 'Lateef', 'Traditional Arabic', system-ui, sans-serif;
 }
 
+/* Claymorphism Utilities */
+.clay-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  border-radius: 24px;
+  box-shadow: 
+    0 15px 30px -10px rgba(16, 185, 129, 0.15),
+    inset 0 4px 6px rgba(255, 255, 255, 0.8),
+    inset 0 -8px 0 rgba(16, 185, 129, 0.1);
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+}
+
+.clay-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 20px 35px -8px rgba(16, 185, 129, 0.2),
+    inset 0 4px 6px rgba(255, 255, 255, 0.9),
+    inset 0 -8px 0 rgba(16, 185, 129, 0.15);
+}
+
 .clay-btn {
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12),
-              inset 0 4px 6px rgba(255, 255, 255, 0.45),
-              inset 0 -8px 16px rgba(0, 0, 0, 0.25);
-  border: 3px solid rgba(255, 255, 255, 0.25);
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 8px 16px -4px rgba(0, 0, 0, 0.15),
+    inset 0 4px 6px rgba(255, 255, 255, 0.45),
+    inset 0 -6px 12px rgba(0, 0, 0, 0.2);
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .clay-btn:active {
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12),
-              inset 0 2px 3px rgba(255, 255, 255, 0.45),
-              inset 0 -3px 8px rgba(0, 0, 0, 0.25);
-  transform: translateY(4px);
+  box-shadow: 
+    0 3px 6px -2px rgba(0, 0, 0, 0.15),
+    inset 0 2px 3px rgba(255, 255, 255, 0.45),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.2);
+  transform: translateY(3px) scale(0.97);
 }
+
 

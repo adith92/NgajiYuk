@@ -33,7 +33,7 @@ export default function DoaView() {
   }, []);
 
   return (
-    <div className="flex-1 pb-10">
+    <div className="flex-1 pb-10 bg-emerald-50/30">
       <Header title={t.menu_doa} onBack={() => navigate('/menu')} />
       <div className="p-4 max-w-3xl mx-auto space-y-6 mt-4">
         {doaData.map((doa, i) => {
@@ -46,37 +46,37 @@ export default function DoaView() {
               key={doa.id}
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: i * 0.1 }}
-              className="bg-white p-6 rounded-3xl shadow-md border-2 border-[var(--primary-color)] relative"
+              transition={{ delay: i * 0.08, type: 'spring', stiffness: 100 }}
+              className="clay-card p-6 bg-white/90 border-[5px] border-white/95 relative shadow-md flex flex-col w-full"
             >
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-bold text-[var(--primary-color)]">{title}</h3>
+              <div className="flex justify-between items-start mb-4 gap-2">
+                <h3 className="text-xl font-black text-emerald-900 tracking-wide">{title}</h3>
                 {!isDone ? (
                    <button 
                      onClick={() => {
                         updateProgress('doa', doa.id, 20);
                         triggerConfetti();
                      }}
-                     className="bg-green-500 text-white px-4 py-2 rounded-full font-bold shadow hover:bg-green-600 active:scale-95"
+                     className="bg-gradient-to-b from-emerald-400 to-emerald-500 text-white font-black px-4 py-2 rounded-2xl shadow-md hover:brightness-105 active:scale-95 border-b-[4px] border-emerald-700 transition-all text-xs shrink-0 cursor-pointer"
                    >
                      Hafal (+20)
                    </button>
                 ) : (
-                  <div className="flex items-center gap-1 text-green-500 font-bold bg-green-50 px-3 py-1 rounded-full border border-green-200">
-                    <Check size={18} /> Hafal
-                  </div>
+                   <div className="flex items-center gap-1 text-emerald-700 font-black bg-emerald-100/50 px-3 py-1.5 rounded-full border border-emerald-200 text-xs shrink-0 select-none shadow-inner">
+                     <Check size={14} className="stroke-[3px]" /> Hafal
+                   </div>
                 )}
               </div>
               
-              <p className="text-3xl font-bold text-right leading-loose tracking-wider mb-4" dir="rtl">{doa.arabic}</p>
-              <p className="text-gray-500 italic mb-2 border-l-4 border-gray-300 pl-3">{doa.latin}</p>
-              <p className="text-gray-700 font-medium bg-gray-50 p-4 rounded-xl mb-4">{arti}</p>
+              <p className="text-3xl font-bold text-right leading-loose tracking-wider mb-5 text-emerald-950 Arabic-Font" style={{ fontFamily: 'Scheherazade New, sans-serif' }} dir="rtl">{doa.arabic}</p>
+              <p className="text-emerald-800/80 italic mb-3 border-l-4 border-emerald-300 pl-3.5 text-sm md:text-base font-medium">{doa.latin}</p>
+              <p className="text-emerald-950 font-bold bg-emerald-50/50 border border-emerald-100/40 p-4 rounded-2xl mb-5 text-sm md:text-base shadow-inner">{arti}</p>
               
               <button 
                 onClick={() => playAudio(`doa_${doa.id}`, `/audio/doa/${doa.id}.mp3`)}
-                className="flex items-center justify-center gap-2 w-full bg-blue-100 text-blue-600 py-3 rounded-2xl font-bold active:scale-95 transition-transform clay-btn"
+                className="flex items-center justify-center gap-2 w-full bg-gradient-to-b from-indigo-400 to-indigo-500 text-white py-3 rounded-2.5xl font-black shadow-md hover:brightness-105 active:scale-[0.98] active:translate-y-0.5 border-b-[4px] border-indigo-700 transition-all cursor-pointer focus:outline-none"
               >
-                <Volume2 /> Dengarkan
+                <Volume2 size={20} /> Dengarkan
               </button>
             </motion.div>
           );

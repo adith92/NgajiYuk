@@ -2,22 +2,23 @@ import { useState, useEffect } from 'react';
 import { useAppStore } from '../lib/store';
 import { useTranslation } from '../lib/i18n';
 import { Header } from './Header';
-import { motion, AnimatePresence } from 'motion/react';
-import { Lock, ArrowLeft, Sparkles, Gamepad2, Trophy } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Lock, ArrowLeft, Sparkles, Gamepad2, Star } from 'lucide-react';
 import { playAudio } from '../lib/audioCache';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
+import { useNavigate } from 'react-router-dom';
 
 function triggerConfettiSpace() {
   confetti({
-    particleCount: 60,
+    particleCount: 65,
     spread: 60,
     origin: { y: 0.6 },
     colors: ['#fbbf24', '#f59e0b', '#38bdf8', '#818cf8', '#ec4899']
   });
 }
 
-export default function GameZoneView() {
+export function GameZoneView() {
   const navigate = useNavigate();
   const { currentUserUid, users, getGameZoneStatus, lockGameZone } = useAppStore();
   const user = currentUserUid ? users[currentUserUid] : null;
@@ -94,33 +95,33 @@ export default function GameZoneView() {
 
 function LockedGameZone({ onBack }: { onBack: () => void }) {
   return (
-    <div className="flex-1 pb-10 flex flex-col">
-      <Header title="Game Zone terkunci" onBack={onBack} />
+    <div className="flex-1 pb-10 flex flex-col bg-emerald-50/30">
+      <Header title="Game Zone Terkunci" onBack={onBack} />
       <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-xl mx-auto w-full mt-4">
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-white p-8 md:p-10 rounded-[3rem] shadow-2xl border-4 border-white text-center w-full relative overflow-hidden"
+          className="clay-card p-8 md:p-10 border-[6px] border-white/95 bg-white/90 text-center w-full relative overflow-hidden shadow-xl"
         >
-          <div className="absolute top-0 left-0 w-20 h-20 bg-gray-100 rounded-full filter blur-xl opacity-50 -translate-x-10 -translate-y-10" />
+          <div className="absolute top-0 left-0 w-20 h-20 bg-gray-100/50 rounded-full filter blur-xl opacity-50 -translate-x-10 -translate-y-10" />
           
-          <div className="w-24 h-24 bg-red-100 text-red-500 rounded-[2rem] mx-auto flex items-center justify-center shadow-lg mb-6 border-b-4 border-red-200">
-            <Lock size={48} className="animate-pulse" />
+          <div className="w-24 h-24 bg-gradient-to-b from-orange-400 to-orange-500 text-white rounded-[2rem] mx-auto flex items-center justify-center shadow-lg mb-6 border-b-[6px] border-orange-700 animate-bounce">
+            <Lock size={42} className="stroke-[3px]" />
           </div>
 
-          <h2 className="text-3xl font-black text-gray-800 mb-4 leading-tight">
+          <h2 className="text-3xl font-black text-emerald-950 mb-4 leading-tight">
             Game Zone Terkunci 🔒
           </h2>
           
-          <p className="text-gray-500 font-medium mb-8 text-base">
-            Selesaikan kuis dengan nilai minimal <span className="font-bold text-blue-500">80%</span> untuk membuka waktu bermain yang seru!
+          <p className="text-emerald-800/80 font-bold mb-8 text-base leading-relaxed">
+            Selesaikan kuis dengan nilai minimal <span className="text-emerald-600 font-black">80%</span> untuk membuka waktu bermain yang seru!
           </p>
 
           <button
             onClick={onBack}
-            className="w-full bg-[var(--primary-color)] text-white px-8 py-4 rounded-2xl font-black shadow-lg border-b-8 border-blue-700 active:border-b-0 active:translate-y-2 hover:scale-[1.02] transition-all text-lg cursor-pointer flex items-center justify-center gap-2"
+            className="w-full bg-gradient-to-b from-emerald-400 to-emerald-500 text-white px-8 py-4 rounded-2xl font-black shadow-md border-b-[6px] border-emerald-700 hover:brightness-105 active:scale-95 transition-all text-lg cursor-pointer flex items-center justify-center gap-2 focus:outline-none"
           >
-            <ArrowLeft size={20} /> Kembali Belajar
+            <ArrowLeft size={20} className="stroke-[3px]" /> Kembali Belajar
           </button>
         </motion.div>
       </div>
@@ -132,21 +133,21 @@ function ActiveGameZone({
   timeLeftStr, score, starPos, bouncing, handleTapStar, lockGameZone, onBack 
 }: any) {
   return (
-    <div className="flex-1 pb-10 flex flex-col min-h-screen bg-gray-50">
+    <div className="flex-1 pb-10 flex flex-col min-h-screen bg-emerald-50/30">
       <Header title="🎮 Game Zone" onBack={onBack} />
       
-      <div className="max-w-4xl mx-auto w-full px-4 mt-4 flex-1 flex flex-col">
+      <div className="max-w-4xl mx-auto w-full px-4 mt-6 flex-1 flex flex-col">
         
         {/* Game Stats and Countdown Overlay */}
         <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-white p-4 rounded-2xl shadow-md border-b-4 border-orange-500 flex flex-col items-center justify-center">
-            <Gamepad2 className="text-orange-500 mb-1" size={20} />
-            <span className="text-xs text-gray-500 font-bold">Skor Game</span>
-            <span className="text-xl font-black text-gray-800">{score}</span>
+          <div className="clay-card p-4 border-[4px] border-white/95 bg-white/90 flex flex-col items-center justify-center shadow-sm">
+            <Gamepad2 className="text-emerald-600 mb-1" size={24} />
+            <span className="text-[10px] text-emerald-800 font-black uppercase tracking-wider">Skor Game</span>
+            <span className="text-2xl font-black text-emerald-900">{score}</span>
           </div>
 
-          <div className="bg-orange-500 text-white p-4 rounded-2xl shadow-md border-b-4 border-orange-700 flex flex-col items-center justify-center">
-            <span className="text-xs text-orange-100 font-black tracking-wider uppercase">Sisa Waktu</span>
+          <div className="bg-gradient-to-b from-amber-400 to-amber-500 text-emerald-950 p-4 rounded-2.5xl shadow-md border-b-[6px] border-amber-700 flex flex-col items-center justify-center">
+            <span className="text-[10px] text-emerald-950/70 font-black tracking-wider uppercase">Sisa Waktu</span>
             <span className="text-2xl font-black tracking-widest">{timeLeftStr}</span>
           </div>
 
@@ -155,42 +156,42 @@ function ActiveGameZone({
               lockGameZone();
               toast("Kamu selesai bermain. Kembali belajar sekarang!", { icon: '📖' });
             }}
-            className="bg-red-50 text-red-500 p-4 rounded-2xl shadow-md border border-red-200 active:translate-y-1 transition-all flex flex-col items-center justify-center font-bold text-xs hover:bg-red-100 cursor-pointer"
+            className="bg-gradient-to-b from-rose-400 to-rose-500 text-white p-4 rounded-2.5xl shadow-md border-b-[6px] border-rose-700 active:scale-95 hover:brightness-105 transition-all flex flex-col items-center justify-center font-black text-xs cursor-pointer focus:outline-none"
           >
             🔒 Selesai Main
           </button>
         </div>
 
         {/* Space Outer Boundary Play Field */}
-        <div className="flex-1 min-h-[350px] relative bg-slate-900 rounded-[2.5rem] shadow-2xl border-4 border-white overflow-hidden flex flex-col justify-between p-4">
+        <div className="flex-1 min-h-[380px] relative bg-slate-900 rounded-[2.5rem] shadow-2xl border-[6px] border-white overflow-hidden flex flex-col justify-between p-4 mb-4">
           
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900 via-slate-900 to-black pointer-events-none" />
-          <div className="absolute top-4 left-6 text-white/30 text-xs font-mono pointer-events-none flex items-center gap-1">
-            <Sparkles size={12} className="animate-spin" /> AREA LUAR ANGKASA
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-950 via-slate-950 to-black pointer-events-none opacity-95" />
+          <div className="absolute top-4 left-6 text-white/30 text-xs font-black tracking-widest pointer-events-none flex items-center gap-1.5 select-none">
+            <Sparkles size={12} className="animate-spin text-emerald-400" /> JALUR BINTANG ANGKASA
           </div>
 
-          <div className="absolute top-10 right-10 text-xl pointer-events-none animate-bounce">🌙</div>
-          <div className="absolute bottom-10 left-12 text-sm pointer-events-none opacity-40">🪐</div>
+          <div className="absolute top-10 right-10 text-3xl pointer-events-none animate-bounce select-none">🌙</div>
+          <div className="absolute bottom-10 left-12 text-2xl pointer-events-none opacity-40 select-none">🪐</div>
 
           <div className="absolute inset-0">
             <motion.button
               onClick={handleTapStar}
-              animate={bouncing ? { scale: 1.4 } : { y: [0, -6, 0] }}
-              transition={bouncing ? { duration: 0.1 } : { duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              animate={bouncing ? { scale: 1.45 } : { y: [0, -8, 0] }}
+              transition={bouncing ? { duration: 0.1 } : { duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
               style={{
                 position: 'absolute',
                 top: starPos.top,
                 left: starPos.left,
                 transform: 'translate(-50%, -50%)',
               }}
-              className="w-16 h-16 md:w-20 md:h-20 bg-yellow-400 rounded-full flex items-center justify-center text-4xl md:text-5xl shadow-[0_0_30px_#f59e0b] hover:bg-yellow-300 active:scale-90 transition-all border-4 border-white cursor-pointer z-10 select-none"
+              className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-b from-amber-350 to-amber-500 rounded-full flex items-center justify-center shadow-[0_0_35px_#fbbf24] hover:brightness-110 active:scale-90 transition-all border-4 border-white cursor-pointer z-10 select-none text-4xl md:text-5xl"
             >
               ⭐
             </motion.button>
           </div>
 
-          <div className="w-full text-center text-white/60 pointer-events-none text-xs md:text-sm font-semibold tracking-wider uppercase py-2 bg-black/20 backdrop-blur-sm rounded-full mt-auto">
-            Kejar dan Tap Bintang Emas untuk menambah skor! 🌟
+          <div className="w-full text-center text-emerald-100/70 pointer-events-none text-xs md:text-sm font-black tracking-wide uppercase py-2.5 bg-white/5 backdrop-blur-sm rounded-2xl mt-auto border border-white/5 select-none">
+            Ketuk Bintang Emas yang melayang untuk menambah skor! 🌟
           </div>
         </div>
 
