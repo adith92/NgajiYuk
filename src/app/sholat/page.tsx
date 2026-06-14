@@ -16,7 +16,7 @@ function triggerConfetti() {
     particleCount: 100,
     spread: 70,
     origin: { y: 0.6 },
-    colors: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#ec4899']
+    colors: ['#34d399', '#38bdf8', '#fbbf24', '#f472b6', '#a78bfa']
   });
 }
 
@@ -36,7 +36,7 @@ export default function SholatPage() {
 
   return (
     <div className="min-h-screen pb-10">
-      <Header title="Tata Cara Sholat" onBack={() => router.push('/dashboard')} />
+      <Header title="Tata Cara Sholat 🕌" onBack={() => router.push('/dashboard')} />
       <div className="p-6 max-w-3xl mx-auto space-y-6 mt-4">
         {sholatData.map((sholat, i) => {
           const isDone = completed.includes(sholat.id);
@@ -48,42 +48,47 @@ export default function SholatPage() {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: i * 0.08, type: 'spring', stiffness: 100 }}
-              className="glass-panel p-6 relative flex flex-col w-full rounded-3xl border border-slate-700/50 hover:border-emerald-500/50 transition-colors group overflow-hidden"
+              className="glass-panel p-6 relative flex flex-col w-full rounded-3xl border-2 border-emerald-200 hover:border-emerald-400 transition-colors group overflow-hidden"
             >
               {/* Glow background */}
-              <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-emerald-200/0 rounded-full blur-3xl opacity-0 group-hover:opacity-100 group-hover:bg-emerald-200/30 transition-all duration-500" />
               
-              <div className="relative z-10 flex justify-between items-start mb-6 gap-4">
-                <h3 className="text-xl font-bold text-white tracking-wide">{title}</h3>
+              {/* Step number badge */}
+              <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gradient-to-br from-amber-300 to-orange-400 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                {i + 1}
+              </div>
+              
+              <div className="relative z-10 flex justify-between items-start mb-6 gap-4 pr-14">
+                <h3 className="text-xl font-bold text-slate-700 tracking-wide">{title}</h3>
                 {!isDone ? (
                    <button 
                      onClick={() => {
                        updateProgress('sholat', sholat.id, 15);
                        triggerConfetti();
                      }}
-                     className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 hover:text-emerald-200 font-semibold px-4 py-2 rounded-xl shadow-lg border border-emerald-500/30 transition-all text-sm shrink-0 backdrop-blur-md"
+                     className="bg-emerald-100 hover:bg-emerald-200 text-emerald-600 hover:text-emerald-700 font-semibold px-4 py-2 rounded-xl shadow-md border border-emerald-200 transition-all text-sm shrink-0"
                    >
                      Selesai (+15)
                    </button>
                 ) : (
-                  <div className="flex items-center gap-1.5 text-teal-300 font-semibold bg-teal-500/20 px-4 py-2 rounded-xl border border-teal-500/30 text-sm shrink-0 backdrop-blur-md">
+                  <div className="flex items-center gap-1.5 text-teal-600 font-semibold bg-teal-100 px-4 py-2 rounded-xl border border-teal-200 text-sm shrink-0">
                     <Check size={16} /> Selesai
                   </div>
                 )}
               </div>
               
-              <p className="relative z-10 text-3xl font-bold text-right leading-loose tracking-wider mb-5 text-emerald-100 Arabic-Font drop-shadow-md" style={{ fontFamily: 'Scheherazade New, sans-serif' }} dir="rtl">{sholat.arabic}</p>
+              <p className="relative z-10 text-3xl font-bold text-right leading-loose tracking-wider mb-5 text-amber-800 Arabic-Font drop-shadow-sm" style={{ fontFamily: 'Scheherazade New, sans-serif' }} dir="rtl">{sholat.arabic}</p>
               
               <div className="relative z-10 space-y-4">
-                <p className="text-slate-300 italic border-l-4 border-emerald-500/50 pl-4 text-sm md:text-base leading-relaxed">{sholat.latin}</p>
-                <p className="text-slate-200 bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl text-sm md:text-base shadow-inner leading-relaxed">{sholat.translation}</p>
+                <p className="text-slate-600 italic border-l-4 border-emerald-300 pl-4 text-sm md:text-base leading-relaxed">{sholat.latin}</p>
+                <p className="text-slate-700 bg-white/60 border border-slate-200 p-4 rounded-2xl text-sm md:text-base shadow-inner leading-relaxed">{sholat.translation}</p>
               </div>
               
               <motion.button 
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => playAudio(`sholat_${sholat.id}`, `/audio/sholat/${sholat.id}.mp3`)}
-                className="relative z-10 mt-6 flex items-center justify-center gap-2 w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white py-3 rounded-xl font-semibold shadow-lg shadow-emerald-500/25 transition-all"
+                className="relative z-10 mt-6 flex items-center justify-center gap-2 w-full bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-white py-3 rounded-xl font-semibold shadow-md shadow-emerald-200/40 transition-all"
               >
                 <Volume2 size={20} /> Dengarkan
               </motion.button>

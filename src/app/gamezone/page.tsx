@@ -104,18 +104,18 @@ function LockedGameZone({ onBack }: { onBack: () => void }) {
           animate={{ scale: 1, opacity: 1 }}
           className="glass-panel p-8 md:p-10 rounded-3xl text-center w-full relative overflow-hidden"
         >
-          <div className="absolute top-0 left-0 w-64 h-64 bg-slate-500/10 rounded-full filter blur-3xl opacity-50 -translate-x-10 -translate-y-10" />
+          <div className="absolute top-0 left-0 w-64 h-64 bg-orange-100/40 rounded-full filter blur-3xl opacity-50 -translate-x-10 -translate-y-10" />
           
           <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-rose-500 text-white rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-orange-500/20 mb-6 animate-bounce">
             <Lock size={42} />
           </div>
 
-          <h2 className="text-3xl font-bold text-white mb-4 leading-tight relative z-10">
+          <h2 className="text-3xl font-bold text-slate-700 mb-4 leading-tight relative z-10">
             Game Zone Terkunci 🔒
           </h2>
           
-          <p className="text-slate-300 font-medium mb-8 text-base leading-relaxed relative z-10">
-            Selesaikan kuis dengan nilai minimal <span className="text-teal-400 font-bold">80%</span> untuk membuka waktu bermain yang seru!
+          <p className="text-slate-500 font-medium mb-8 text-base leading-relaxed relative z-10">
+            Selesaikan kuis dengan nilai minimal <span className="text-emerald-500 font-bold">80%</span> untuk membuka waktu bermain yang seru!
           </p>
 
           <button
@@ -141,15 +141,15 @@ function ActiveGameZone({
         
         {/* Game Stats and Countdown */}
         <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center border border-slate-700/50">
-            <Gamepad2 className="text-teal-400 mb-1" size={24} />
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Skor Game</span>
-            <span className="text-2xl font-bold text-white">{score}</span>
+          <div className="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center border border-sky-200">
+            <Gamepad2 className="text-sky-500 mb-1" size={24} />
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Skor Game</span>
+            <span className="text-2xl font-bold text-slate-700">{score}</span>
           </div>
 
-          <div className="bg-gradient-to-br from-amber-500/20 to-orange-500/20 p-4 rounded-2xl border border-amber-500/30 flex flex-col items-center justify-center backdrop-blur-md">
-            <span className="text-[10px] text-amber-200/70 font-bold tracking-wider uppercase">Sisa Waktu</span>
-            <span className="text-2xl font-bold tracking-widest text-amber-400">{timeLeftStr}</span>
+          <div className="bg-gradient-to-br from-amber-100 to-orange-100 p-4 rounded-2xl border border-amber-200 flex flex-col items-center justify-center backdrop-blur-md">
+            <span className="text-[10px] text-amber-600 font-bold tracking-wider uppercase">Sisa Waktu</span>
+            <span className="text-2xl font-bold tracking-widest text-amber-500">{timeLeftStr}</span>
           </div>
 
           <button 
@@ -157,7 +157,7 @@ function ActiveGameZone({
               lockGameZone();
               alert("Kamu selesai bermain. Kembali belajar sekarang!");
             }}
-            className="bg-rose-500/20 hover:bg-rose-500/30 p-4 rounded-2xl border border-rose-500/30 flex flex-col items-center justify-center font-bold text-xs text-rose-300 transition-all"
+            className="bg-rose-100 hover:bg-rose-200 p-4 rounded-2xl border border-rose-200 flex flex-col items-center justify-center font-bold text-xs text-rose-500 transition-all"
           >
             🔒 Selesai Main
           </button>

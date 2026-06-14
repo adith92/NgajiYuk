@@ -22,7 +22,7 @@ function triggerConfetti() {
     particleCount: 80,
     spread: 60,
     origin: { y: 0.6 },
-    colors: ['#14b8a6', '#8b5cf6', '#10b981', '#f59e0b', '#0ea5e9']
+    colors: ['#38bdf8', '#34d399', '#fbbf24', '#f472b6', '#a78bfa']
   });
 }
 
@@ -79,23 +79,23 @@ export default function HijaiyahPage() {
               onClick={() => handleCharClick(hija)}
               className={cn(
                 "relative aspect-square rounded-3xl flex flex-col items-center justify-center p-2 overflow-hidden group cursor-pointer transition-all",
-                "glass-panel border border-slate-700/50 hover:border-teal-500/50 hover:shadow-teal-500/20",
-                isActive ? "z-10 bg-teal-500/20 border-teal-500 shadow-[0_0_30px_rgba(20,184,166,0.3)]" : "z-0"
+                "glass-panel border-2 border-sky-200 hover:border-sky-400 hover:shadow-sky-200/30",
+                isActive ? "z-10 bg-sky-100/60 border-sky-400 shadow-[0_0_30px_rgba(56,189,248,0.2)]" : "z-0"
               )}
             >
               {/* Glass reflection */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               
               {isDone && (
-                <div className="absolute top-3 right-3 bg-teal-500/20 p-1.5 rounded-full border border-teal-500/50 backdrop-blur-md">
-                  <Check size={14} className="text-teal-400" />
+                <div className="absolute top-3 right-3 bg-emerald-100 p-1.5 rounded-full border border-emerald-300 backdrop-blur-md">
+                  <Check size={14} className="text-emerald-500" />
                 </div>
               )}
               
-              <span className="text-5xl md:text-6xl font-black drop-shadow-[0_2px_10px_rgba(255,255,255,0.1)] leading-none text-white Arabic-Font" style={{ fontFamily: 'Scheherazade New, sans-serif' }}>
+              <span className="text-5xl md:text-6xl font-black drop-shadow-[0_2px_10px_rgba(0,0,0,0.05)] leading-none text-amber-700 Arabic-Font" style={{ fontFamily: 'Scheherazade New, sans-serif' }}>
                 {hija.arabic}
               </span>
-              <span className="text-sm md:text-base font-bold mt-3 tracking-wider uppercase text-slate-400 group-hover:text-teal-300 transition-colors">
+              <span className="text-sm md:text-base font-bold mt-3 tracking-wider uppercase text-slate-500 group-hover:text-sky-600 transition-colors">
                 {hija.name}
               </span>
             </motion.button>
