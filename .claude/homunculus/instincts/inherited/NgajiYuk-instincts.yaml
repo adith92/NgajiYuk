@@ -1,0 +1,452 @@
+# Instincts generated from https://github.com/adith92/NgajiYuk
+# Generated: 2026-07-12T09:54:57.343Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: NgajiYuk-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: feat, fix
+
+## Evidence
+
+- 13 commits analyzed
+- Detected conventional commit pattern
+- Examples: feat(ui): add reusable status badge, fix(ui): use local speech recognition types
+
+---
+id: NgajiYuk-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Commit Length
+
+## Action
+
+Keep commit messages concise (~46 characters)
+
+## Evidence
+
+- Average commit message length: 46 chars
+- Based on 13 commits
+
+---
+id: NgajiYuk-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: NgajiYuk-import-alias
+trigger: "when importing modules"
+confidence: 0.85
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Import Alias
+
+## Action
+
+Use path aliases (@/, ~/) instead of relative imports
+
+## Evidence
+
+- Import analysis shows alias pattern
+- Example: import { x } from '@/lib/x'
+
+---
+id: NgajiYuk-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Export Style
+
+## Action
+
+Prefer default exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: default
+
+---
+id: NgajiYuk-arch-type-based
+trigger: "when adding new code"
+confidence: 0.8
+domain: architecture
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Arch Type Based
+
+## Action
+
+Place code in the appropriate type folder (components/, services/, utils/, etc.)
+
+## Evidence
+
+- Type-based module organization detected
+- Folders: app, components
+
+---
+id: NgajiYuk-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: NgajiYuk-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~28x per month
+- Files: src/components/ui/*, src/components/*, src/app/*
+
+---
+id: NgajiYuk-workflow-redesign-or-add-page-flow
+trigger: "when doing redesign or add page flow"
+confidence: 0.8
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Workflow Redesign Or Add Page Flow
+
+## Action
+
+Follow the redesign-or-add-page-flow workflow:
+1. Edit or create a file at src/app/<feature>/page.tsx
+2. Implement new UI/UX or learning flow logic
+3. Commit with a 'feat(ui): redesign <feature>...' or similar message
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~6x per month
+- Files: src/app/dashboard/page.tsx, src/app/progress/page.tsx, src/app/hijaiyah/page.tsx
+
+---
+id: NgajiYuk-workflow-ui-component-addition-or-redesign
+trigger: "when doing ui component addition or redesign"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Workflow Ui Component Addition Or Redesign
+
+## Action
+
+Follow the ui-component-addition-or-redesign workflow:
+1. Create or edit a file in src/components/
+2. Implement or update the UI logic and styles
+3. Commit with a 'feat(ui): add/rebuild/redesign...' message
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: src/components/ui/StatusBadge.tsx, src/components/MenuCard.tsx, src/components/Header.tsx
+
+---
+id: ngajiyuk-instinct-file-naming
+trigger: "When creating a new file in the codebase"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct File Naming
+
+## Action
+
+Name the file using camelCase (e.g., statusBadge.tsx)
+
+## Evidence
+
+- Pattern in src/components/ui/StatusBadge.tsx
+- Pattern in src/components/MenuCard.tsx
+
+---
+id: ngajiyuk-instinct-function-naming
+trigger: "When defining a new function"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Function Naming
+
+## Action
+
+Name the function using camelCase
+
+## Evidence
+
+- Pattern in codeStyle.namingConventions.functions
+
+---
+id: ngajiyuk-instinct-class-naming
+trigger: "When defining a new class"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Class Naming
+
+## Action
+
+Name the class using PascalCase
+
+## Evidence
+
+- Pattern in codeStyle.namingConventions.classes
+
+---
+id: ngajiyuk-instinct-constant-naming
+trigger: "When declaring a constant"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Constant Naming
+
+## Action
+
+Name the constant using SCREAMING_SNAKE_CASE
+
+## Evidence
+
+- Pattern in codeStyle.namingConventions.constants
+
+---
+id: ngajiyuk-instinct-import-alias
+trigger: "When importing modules"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Import Alias
+
+## Action
+
+Use import aliases for module paths
+
+## Evidence
+
+- Pattern in codeStyle.importStyle
+
+---
+id: ngajiyuk-instinct-default-export
+trigger: "When exporting a module or component"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Default Export
+
+## Action
+
+Use default export style
+
+## Evidence
+
+- Pattern in codeStyle.exportStyle
+
+---
+id: ngajiyuk-instinct-test-location
+trigger: "When adding tests for a feature or component"
+confidence: 0.7
+domain: testing
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Test Location
+
+## Action
+
+Place test files in a separate test directory
+
+## Evidence
+
+- Pattern in architecture.folderStructure.testLocation
+
+---
+id: ngajiyuk-instinct-feature-test-sequence
+trigger: "When implementing a new feature"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Feature Test Sequence
+
+## Action
+
+Add tests for the feature after implementation and before documentation update
+
+## Evidence
+
+- Pattern in workflows[0].commitSequence: 'Add tests for feature' after 'Add feature implementation'
+
+---
+id: ngajiyuk-instinct-conventional-commit
+trigger: "When making a git commit"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Conventional Commit
+
+## Action
+
+Use conventional commit format with 'feat' or 'fix' prefix, scope in parentheses, and a concise description (e.g., 'feat(ui): add reusable status badge')
+
+## Evidence
+
+- Seen in commit 'feat(ui): add reusable status badge'
+- Pattern in commits.prefixes
+
+---
+id: ngajiyuk-instinct-feature-development-workflow
+trigger: "When developing a new feature"
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Feature Development Workflow
+
+## Action
+
+Follow the sequence: implement feature in src/components/ui/* or src/app/*, add tests, update documentation, and commit each step
+
+## Evidence
+
+- Pattern in workflows[0] (feature-development)
+- Example commits and files
+
+---
+id: ngajiyuk-instinct-redesign-or-add-page-flow
+trigger: "When redesigning or adding a feature page in the app"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Redesign Or Add Page Flow
+
+## Action
+
+Edit or create src/app/<feature>/page.tsx, implement new UI/UX or learning flow logic, and commit with 'feat(ui): redesign <feature>...' message
+
+## Evidence
+
+- Pattern in workflows[1] (redesign-or-add-page-flow)
+- Example commits and files
+
+---
+id: ngajiyuk-instinct-ui-component-addition-or-redesign
+trigger: "When adding or redesigning a UI component"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Ui Component Addition Or Redesign
+
+## Action
+
+Create or edit a file in src/components/, implement or update UI logic and styles, and commit with 'feat(ui): add/rebuild/redesign...' message
+
+## Evidence
+
+- Pattern in workflows[2] (ui-component-addition-or-redesign)
+- Example commits and files
+
