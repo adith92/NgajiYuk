@@ -1,0 +1,45 @@
+name: Apply one-time quiz session fix
+
+on:
+  push:
+    branches:
+      - test/ci-quality-gates
+
+permissions:
+  contents: write
+
+concurrency:
+  group: one-time-session-id-fix
+  cancel-in-progress: true
+
+jobs:
+  apply:
+    name: Apply quiz session fix
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout testing branch
+        uses: actions/checkout@v4
+        with:
+          ref: test/ci-quality-gates
+          fetch-depth: 0
+
+      - name: Apply source patch
+        run: node scripts/apply-session-id-fix.mjs
+
+      - name: Remove temporary automation
+        run: |
+          rm -f scripts/apply-session-id-fix.mjs
+          rm -f .github/workflows/apply-session-id-fix.yml
+
+      - name: Commit branch-only fix
+        run: |
+          git config user.name "NgajiYuk CI Fixer"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "fix(quiz): generate session IDs outside render"
+          git push origin HEAD:test/ci-quality-gates
