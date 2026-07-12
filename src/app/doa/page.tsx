@@ -1,37 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronLeft, ChevronRight, Heart, Loader2, Mic, MicOff, Volume2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
 import { Header } from "@/components/Header";
+import { useSpeechPractice } from "@/hooks/useSpeechPractice";
 import { useAppStore } from "@/lib/store";
 import { doaData } from "@/data/doa";
 import { playAudio } from "@/lib/audioCache";
-import { normalizeArabic, stringSimilarity } from "@/lib/utils";
-
-interface SpeechResultEvent {
-  results: {
-    [index: number]: {
-      [index: number]: { transcript: string };
-    };
-  };
-}
-
-interface SpeechRecognitionController {
-  lang: string;
-  interimResults: boolean;
-  maxAlternatives: number;
-  onstart: (() => void) | null;
-  onresult: ((event: SpeechResultEvent) => void) | null;
-  onerror: (() => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-  stop: () => void;
-}
-
-type SpeechRecognitionConstructor = new () => SpeechRecognitionController;
 
 function celebrate() {
   confetti({ particleCount: 90, spread: 68, origin: { y: 0.7 }, colors: ["#fb7185", "#facc15", "#8b5cf6", "#38bdf8"] });
@@ -42,56 +20,22 @@ export default function DoaPage() {
   const { currentUserUid, progress, updateProgress } = useAppStore();
   const completed = currentUserUid ? progress[currentUserUid]?.doa?.completedItems ?? [] : [];
   const [activeIndex, setActiveIndex] = useState(0);
-  const [recordingId, setRecordingId] = useState<string | null>(null);
-  const [message, setMessage] = useState<{ text: string; type: "info" | "success" | "error"; score?: number } | null>(null);
   const activeDoa = doaData[activeIndex];
   const isDone = completed.includes(activeDoa.id);
+
+  const handleSpeechMatch = useCallback(() => {
+    if (!completed.includes(activeDoa.id)) updateProgress("doa", activeDoa.id, 20);
+    celebrate();
+  }, [activeDoa.id, completed, updateProgress]);
+
+  const speech = useSpeechPractice({ threshold: 0.7, language: "ar-SA", onMatched: handleSpeechMatch });
 
   useEffect(() => () => confetti.reset(), []);
 
   const move = (direction: number) => {
-    setMessage(null);
+    speech.stop();
+    speech.clear();
     setActiveIndex((current) => (current + direction + doaData.length) % doaData.length);
-  };
-
-  const startRecording = () => {
-    const speechWindow = window as typeof window & {
-      SpeechRecognition?: SpeechRecognitionConstructor;
-      webkitSpeechRecognition?: SpeechRecognitionConstructor;
-    };
-    const SpeechRecognition = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      setMessage({ text: "Browser ini belum mendukung latihan mikrofon. Coba gunakan Chrome terbaru.", type: "error" });
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = "ar-SA";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    recognition.onstart = () => {
-      setRecordingId(activeDoa.id);
-      setMessage({ text: "Mendengarkan... baca perlahan ya 🎙️", type: "info" });
-    };
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      const score = Math.round(stringSimilarity(normalizeArabic(activeDoa.arabic), normalizeArabic(transcript)) * 100);
-      if (score >= 70) {
-        setMessage({ text: "Bagus! Transkrip suara cukup mirip. Tetap belajar bersama pembimbing ya.", type: "success", score });
-        if (!completed.includes(activeDoa.id)) updateProgress("doa", activeDoa.id, 20);
-        celebrate();
-      } else {
-        setMessage({ text: `Yuk coba lagi. Mikrofon menangkap: “${transcript}”`, type: "error", score });
-      }
-      setRecordingId(null);
-    };
-    recognition.onerror = () => {
-      setRecordingId(null);
-      setMessage({ text: "Suaranya belum tertangkap jelas. Dekatkan mikrofon lalu coba lagi.", type: "error" });
-    };
-    recognition.onend = () => setRecordingId(null);
-    recognition.start();
   };
 
   const markComplete = () => {
@@ -118,15 +62,13 @@ export default function DoaPage() {
             <p className="text-xs font-black uppercase tracking-[0.18em] text-pink-500">{activeDoa.title}</p>
             <p dir="rtl" className="arabic-font mx-auto mt-6 max-w-3xl text-3xl font-bold leading-[2.1] text-[#32143f] sm:text-4xl">{activeDoa.arabic}</p>
             <p className="mx-auto mt-5 max-w-3xl text-sm font-bold italic leading-6 text-slate-600 sm:text-base">{activeDoa.latin}</p>
-            <div className="mx-auto mt-5 max-w-3xl rounded-2xl border border-pink-100 bg-pink-50/70 p-4 text-sm font-medium leading-6 text-slate-600">
-              <span className="font-black text-pink-700">Artinya:</span> {activeDoa.translation}
-            </div>
+            <div className="mx-auto mt-5 max-w-3xl rounded-2xl border border-pink-100 bg-pink-50/70 p-4 text-sm font-medium leading-6 text-slate-600"><span className="font-black text-pink-700">Artinya:</span> {activeDoa.translation}</div>
 
             <AnimatePresence mode="wait">
-              {message ? (
-                <motion.div key={message.text} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className={`mx-auto mt-5 max-w-3xl rounded-2xl border p-4 text-left text-sm font-semibold ${message.type === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-800" : message.type === "error" ? "border-rose-200 bg-rose-50 text-rose-800" : "border-sky-200 bg-sky-50 text-sky-800"}`}>
-                  <div className="flex items-start gap-2">{message.type === "info" ? <Loader2 className="mt-0.5 animate-spin" size={17} /> : null}<span>{message.text}</span></div>
-                  {typeof message.score === "number" ? <div className="mt-3 h-2 overflow-hidden rounded-full bg-white"><div className={`h-full rounded-full ${message.score >= 70 ? "bg-emerald-500" : "bg-rose-500"}`} style={{ width: `${message.score}%` }} /></div> : null}
+              {speech.feedback ? (
+                <motion.div key={speech.feedback.text} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className={`mx-auto mt-5 max-w-3xl rounded-2xl border p-4 text-left text-sm font-semibold ${speech.feedback.type === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-800" : speech.feedback.type === "error" ? "border-rose-200 bg-rose-50 text-rose-800" : "border-sky-200 bg-sky-50 text-sky-800"}`}>
+                  <div className="flex items-start gap-2">{speech.feedback.type === "info" ? <Loader2 className="mt-0.5 animate-spin" size={17} /> : null}<span>{speech.feedback.text}</span></div>
+                  {typeof speech.feedback.score === "number" ? <div className="mt-3 h-2 overflow-hidden rounded-full bg-white"><div className={`h-full rounded-full ${speech.feedback.score >= 70 ? "bg-emerald-500" : "bg-rose-500"}`} style={{ width: `${speech.feedback.score}%` }} /></div> : null}
                 </motion.div>
               ) : null}
             </AnimatePresence>
@@ -134,7 +76,7 @@ export default function DoaPage() {
 
           <div className="relative z-10 mt-5 grid gap-3 sm:grid-cols-3">
             <button type="button" onClick={() => playAudio(`doa_${activeDoa.id}`, `/audio/doa/${activeDoa.id}.mp3`)} className="kid-button flex items-center justify-center gap-2 border border-white/80 bg-white/90 px-5 py-3 text-pink-800 shadow-sm"><Volume2 size={19} /> Dengarkan</button>
-            <button type="button" onClick={() => recordingId ? (setRecordingId(null), setMessage(null)) : startRecording()} className={`kid-button flex items-center justify-center gap-2 px-5 py-3 shadow-lg ${recordingId ? "bg-rose-500 text-white" : "bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white shadow-pink-300/40"}`}>{recordingId ? <MicOff size={19} /> : <Mic size={19} />}{recordingId ? "Berhenti" : "Ucapkan"}</button>
+            <button type="button" onClick={() => speech.isRecording ? speech.stop() : speech.start(activeDoa.arabic)} className={`kid-button flex items-center justify-center gap-2 px-5 py-3 shadow-lg ${speech.isRecording ? "bg-rose-500 text-white" : "bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white shadow-pink-300/40"}`}>{speech.isRecording ? <MicOff size={19} /> : <Mic size={19} />}{speech.isRecording ? "Berhenti" : "Ucapkan"}</button>
             <button type="button" onClick={markComplete} className={`kid-button flex items-center justify-center gap-2 px-5 py-3 shadow-lg ${isDone ? "bg-emerald-600 text-white" : "bg-white/90 text-emerald-700"}`}><Check size={19} /> {isDone ? "Sudah hafal" : "Tandai selesai"}</button>
           </div>
 
