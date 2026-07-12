@@ -1,301 +1,168 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useAppStore } from '@/lib/store';
-import { useTranslation } from '@/lib/i18n';
-import { hijaiyahData } from '@/data/hijaiyah';
-import { Header } from '@/components/Header';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Volume2, Trophy, ArrowRight, X, Check } from 'lucide-react';
-import { playAudio } from '@/lib/audioCache';
-import confetti from 'canvas-confetti';
-import { useRouter } from 'next/navigation';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { useCallback, useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Check, Clock3, RotateCcw, Trophy, Volume2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import confetti from "canvas-confetti";
+import { Header } from "@/components/Header";
+import { hijaiyahData } from "@/data/hijaiyah";
+import { playAudio } from "@/lib/audioCache";
+import { useAppStore, type QuizHistory } from "@/lib/store";
 
-function cn(...classes: ClassValue[]) {
-  return twMerge(clsx(classes));
+type HijaiyahItem = (typeof hijaiyahData)[number];
+type QuizStatus = "playing" | "correct" | "wrong" | "result";
+
+const QUESTION_COUNT = 10;
+
+function celebrate() {
+  confetti({ particleCount: 90, spread: 70, origin: { y: 0.68 }, colors: ["#facc15", "#22c55e", "#8b5cf6", "#38bdf8"] });
 }
 
-function triggerConfetti() {
-  confetti({
-    particleCount: 100,
-    spread: 70,
-    origin: { y: 0.6 },
-    colors: ['#38bdf8', '#34d399', '#fbbf24', '#f472b6', '#a78bfa']
-  });
+function createQuestion() {
+  const shuffled = [...hijaiyahData].sort(() => Math.random() - 0.5);
+  const options = shuffled.slice(0, 4);
+  return { options, target: options[Math.floor(Math.random() * options.length)] };
 }
 
 export default function KuisPage() {
   const router = useRouter();
-  const { currentUserUid, users, updateProgress, completeQuizSession } = useAppStore();
-  const user = currentUserUid ? users[currentUserUid] : null;
-  const t = useTranslation(user?.language || 'id') as any;
-  const [options, setOptions] = useState<any[]>([]);
-  const [target, setTarget] = useState<any>(null);
-  const [message, setMessage] = useState('');
-  const [status, setStatus] = useState<'playing' | 'correct' | 'wrong' | 'result'>('playing');
-
-  // Session state counters
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const { updateProgress, completeQuizSession } = useAppStore();
+  const [{ options, target }, setQuestion] = useState(createQuestion);
+  const [status, setStatus] = useState<QuizStatus>("playing");
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
-  const [hasGuessed, setHasGuessed] = useState(false);
-  const [resultSummary, setResultSummary] = useState<any | null>(null);
+  const [result, setResult] = useState<QuizHistory | null>(null);
 
-  const generateQuiz = () => {
-    setMessage('');
-    setStatus('playing');
-    setHasGuessed(false);
-    const shuffled = [...hijaiyahData].sort(() => 0.5 - Math.random());
-    const selectedOptions = shuffled.slice(0, 4);
-    const targetChar = selectedOptions[Math.floor(Math.random() * 4)];
-    setOptions(selectedOptions);
-    setTarget(targetChar);
-    
-    setTimeout(() => {
-      announceTarget(targetChar);
-    }, 500);
-  };
-
-  const announceTarget = (char: any) => {
-    if (!char) return;
-    playAudio(`kuis_hijaiyah_${char.id}`, `/audio/kuis/hijaiyah_${char.id}.mp3`);
-  };
-
-  useEffect(() => {
-    generateQuiz();
-    return () => {
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-      confetti.reset();
-    };
+  const announceTarget = useCallback((item: HijaiyahItem) => {
+    playAudio(`kuis_hijaiyah_${item.id}`, `/audio/kuis/hijaiyah_${item.id}.mp3`);
   }, []);
 
-  const advanceQuiz = (currentCorrect: number, currentWrong: number) => {
-    if (currentQuestionIndex < 9) {
-      setCurrentQuestionIndex(prev => prev + 1);
-      generateQuiz();
-    } else {
-      // Completed 10 questions!
-      const totalQuestions = 10;
-      const historyItem = completeQuizSession('kuis_hijaiyah', totalQuestions, currentCorrect, currentWrong);
-      setResultSummary(historyItem);
-      setStatus('result');
+  useEffect(() => {
+    const timer = window.setTimeout(() => announceTarget(target), 450);
+    return () => window.clearTimeout(timer);
+  }, [announceTarget, target]);
+
+  useEffect(() => () => confetti.reset(), []);
+
+  const nextQuestion = (correct: number, wrong: number) => {
+    if (currentIndex < QUESTION_COUNT - 1) {
+      setCurrentIndex((value) => value + 1);
+      setQuestion(createQuestion());
+      setStatus("playing");
+      return;
     }
+
+    const summary = completeQuizSession("kuis_hijaiyah", QUESTION_COUNT, correct, wrong);
+    setResult(summary);
+    setStatus("result");
   };
 
-  const handleGuess = (hija: any) => {
-    if (status !== 'playing' || hasGuessed) return;
-    setHasGuessed(true);
+  const handleGuess = (item: HijaiyahItem) => {
+    if (status !== "playing") return;
 
-    if (hija.id === target.id) {
-       setStatus('correct');
-       const newCorrect = correctCount + 1;
-       setCorrectCount(newCorrect);
-       setMessage("Benar! 🎉");
-       updateProgress('kuis_hijaiyah', Date.now().toString(), 15);
-       triggerConfetti();
-       playAudio('kuis_correct', `/audio/kuis/correct.mp3`);
-
-       setTimeout(() => {
-         advanceQuiz(newCorrect, wrongCount);
-       }, 2000);
+    if (item.id === target.id) {
+      const nextCorrect = correctCount + 1;
+      setCorrectCount(nextCorrect);
+      setStatus("correct");
+      updateProgress("kuis_hijaiyah", `question-${currentIndex}-${Date.now()}`, 15);
+      playAudio("kuis_correct", "/audio/kuis/correct.mp3");
+      celebrate();
+      window.setTimeout(() => nextQuestion(nextCorrect, wrongCount), 1200);
     } else {
-       setStatus('wrong');
-       const newWrong = wrongCount + 1;
-       setWrongCount(newWrong);
-       setMessage("Kurang Tepat! 😢");
-       playAudio('kuis_wrong', `/audio/kuis/wrong.mp3`);
-
-       setTimeout(() => {
-         advanceQuiz(correctCount, newWrong);
-       }, 2000);
+      const nextWrong = wrongCount + 1;
+      setWrongCount(nextWrong);
+      setStatus("wrong");
+      playAudio("kuis_wrong", "/audio/kuis/wrong.mp3");
+      window.setTimeout(() => nextQuestion(correctCount, nextWrong), 1200);
     }
   };
 
   const resetQuiz = () => {
-    setCurrentQuestionIndex(0);
+    setQuestion(createQuestion());
+    setStatus("playing");
+    setCurrentIndex(0);
     setCorrectCount(0);
     setWrongCount(0);
-    setResultSummary(null);
-    setHasGuessed(false);
-    setMessage('');
-    setStatus('playing');
-
-    generateQuiz();
+    setResult(null);
   };
 
-  if (status === 'result' && resultSummary) {
-    const isPassed = resultSummary.passed;
+  if (status === "result" && result) {
     return (
-      <div className="min-h-screen pb-10 flex flex-col">
-        <Header title="Kuis Hijaiyah" onBack={() => router.push('/dashboard')} />
-        <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-xl mx-auto w-full mt-4">
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="glass-panel p-8 md:p-10 rounded-3xl text-center w-full relative overflow-hidden"
-          >
-            {/* Glow */}
-            <div className={`absolute top-0 left-0 w-64 h-64 ${isPassed ? 'bg-emerald-200/40' : 'bg-orange-200/40'} rounded-full filter blur-3xl opacity-50 -translate-x-10 -translate-y-10`} />
-
-            {isPassed ? (
-              <>
-                <div className="text-8xl mb-6 select-none animate-bounce">🏆</div>
-                <h2 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4 leading-tight">
-                  MasyaAllah! Luar Biasa 🎉
-                </h2>
-                <p className="text-emerald-600 font-medium mb-6 text-lg">
-                  Kamu berhasil menyelesaikan kuis Hijaiyah dengan sangat baik!
-                </p>
-                <div className="bg-white/60 p-6 rounded-3xl mb-8 border border-slate-200 flex flex-col gap-2 relative z-10">
-                  <div className="text-lg text-slate-600">
-                    Skor Kamu: <span className="text-3xl font-bold text-emerald-500 ml-2">{resultSummary.scorePercent}%</span>
-                  </div>
-                  <div className="text-lg text-slate-600 flex items-center justify-center gap-2">
-                    ⏱️ Waktu Bermain: <span className="text-3xl font-bold text-amber-500">{resultSummary.rewardMinutes} Menit</span>
-                  </div>
-                  <p className="text-sm text-emerald-600 mt-2">
-                    Game Zone sekarang terbuka selama {resultSummary.rewardMinutes} menit!
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-                  <button
-                    onClick={() => router.push('/gamezone')}
-                    className="flex-1 bg-sky-400 text-white px-6 py-4 rounded-xl font-bold shadow-lg hover:bg-sky-500 transition-all text-lg"
-                  >
-                    🎮 Game Zone
-                  </button>
-                  <button
-                    onClick={() => router.push('/dashboard')}
-                    className="flex-1 bg-rose-400 text-white hover:bg-rose-500 px-6 py-4 rounded-xl font-bold transition-all text-lg"
-                  >
-                    Kembali
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="text-8xl mb-6 select-none">💪</div>
-                <h2 className="text-3xl md:text-4xl font-bold text-orange-500 mb-4 leading-tight">
-                  Belum unlock, coba lagi!
-                </h2>
-                <p className="text-slate-600 font-medium mb-6 text-lg">
-                  Nilai kamu belum mencukupi untuk membuka Game Zone. Semangat belajar!
-                </p>
-                <div className="bg-white/60 p-6 rounded-3xl mb-8 border border-slate-200 relative z-10">
-                  <div className="text-lg text-slate-600">
-                    Skor Kamu: <span className="text-3xl font-bold text-orange-500 ml-2">{resultSummary.scorePercent}%</span>
-                  </div>
-                  <p className="text-sm text-slate-500 mt-2">
-                    Minimal skor untuk unlock adalah 80%
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-                  <button
-                    onClick={resetQuiz}
-                    className="flex-1 bg-gradient-to-r from-teal-500 to-emerald-500 text-white px-6 py-4 rounded-xl font-bold shadow-lg hover:from-teal-400 hover:to-emerald-400 transition-all text-lg"
-                  >
-                    🔄 Ulangi Kuis
-                  </button>
-                  <button
-                    onClick={() => router.push('/dashboard')}
-                    className="flex-1 bg-white/80 text-slate-700 hover:bg-white px-6 py-4 rounded-xl font-bold border border-slate-200 transition-all text-lg shadow-sm"
-                  >
-                    Kembali
-                  </button>
-                </div>
-              </>
-            )}
-          </motion.div>
+      <main className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-violet-50 pb-12">
+        <Header title="Hasil Kuis Hijaiyah" onBack={() => router.push("/dashboard")} />
+        <div className="mx-auto flex max-w-xl px-4 pt-8 sm:px-6">
+          <motion.article initial={{ opacity: 0, y: 18, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} className="app-card w-full overflow-hidden text-center">
+            <div className={`p-8 text-white ${result.passed ? "bg-gradient-to-r from-emerald-500 to-teal-500" : "bg-gradient-to-r from-orange-500 to-rose-500"}`}>
+              <span className="text-7xl">{result.passed ? "🏆" : "💪"}</span>
+              <h1 className="mt-4 text-3xl font-black">{result.passed ? "MasyaAllah, Hebat!" : "Sedikit Lagi!"}</h1>
+              <p className="mt-2 text-sm font-semibold text-white/85">{result.passed ? "Kamu berhasil membuka reward Game Zone." : "Ulangi kuis dan capai minimal 80%."}</p>
+            </div>
+            <div className="p-6 sm:p-8">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="rounded-2xl bg-violet-50 p-4"><p className="text-2xl font-black text-violet-700">{result.scorePercent}%</p><p className="mt-1 text-[11px] font-bold text-slate-500">Skor</p></div>
+                <div className="rounded-2xl bg-emerald-50 p-4"><p className="text-2xl font-black text-emerald-600">{result.correctAnswers}</p><p className="mt-1 text-[11px] font-bold text-slate-500">Benar</p></div>
+                <div className="rounded-2xl bg-amber-50 p-4"><p className="text-2xl font-black text-amber-600">{result.rewardMinutes}</p><p className="mt-1 text-[11px] font-bold text-slate-500">Menit reward</p></div>
+              </div>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <button type="button" onClick={resetQuiz} className="kid-button flex items-center justify-center gap-2 border border-violet-200 bg-violet-50 px-5 py-3 text-violet-700"><RotateCcw size={18} /> Ulangi kuis</button>
+                <button type="button" onClick={() => router.push(result.passed ? "/gamezone" : "/dashboard")} className="kid-button bg-gradient-to-r from-violet-600 to-purple-700 px-5 py-3 text-white shadow-lg shadow-violet-300/35">{result.passed ? "🎮 Buka Game Zone" : "Kembali belajar"}</button>
+              </div>
+            </div>
+          </motion.article>
         </div>
-      </div>
+      </main>
     );
   }
 
+  const progress = ((currentIndex + 1) / QUESTION_COUNT) * 100;
+
   return (
-    <div className="min-h-screen pb-10 flex flex-col">
-      <Header title="Kuis Hijaiyah" onBack={() => router.push('/dashboard')} />
-      
-      <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-2xl mx-auto w-full mt-4">
-        
-        {/* Progress Bar */}
-        <div className="w-full bg-white/60 h-4 rounded-full overflow-hidden mb-8 border border-slate-200 relative p-0.5">
-          <div 
-            className="bg-gradient-to-r from-sky-400 to-emerald-400 h-full transition-all duration-300 rounded-full shadow-[0_0_10px_rgba(56,189,248,0.3)]"
-            style={{ width: `${((currentQuestionIndex) / 10) * 100}%` }}
-          />
-        </div>
-
-        <div className="mb-8 text-center glass-panel p-8 rounded-3xl w-full relative flex flex-col items-center">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-sky-200/30 rounded-full blur-3xl" />
-          
-          <div className="flex justify-between items-center w-full text-sm font-bold text-slate-600 mb-8 px-2 relative z-10">
-            <span>Pilih Huruf (Soal {Math.min(10, currentQuestionIndex + 1)}/10)</span>
-            <div className="flex gap-3 text-xs">
-              <span className="bg-emerald-100 text-emerald-600 px-3 py-1.5 rounded-full border border-emerald-200 flex items-center gap-1">
-                <Check size={14} /> {correctCount}
-              </span>
-              <span className="bg-orange-100 text-orange-600 px-3 py-1.5 rounded-full border border-orange-200 flex items-center gap-1">
-                <X size={14} /> {wrongCount}
-              </span>
-            </div>
+    <main className="min-h-screen bg-gradient-to-b from-amber-50 via-yellow-50 to-orange-50 pb-12">
+      <Header title="Kuis Hijaiyah" progressLabel={`Soal ${currentIndex + 1} / ${QUESTION_COUNT}`} onBack={() => router.push("/dashboard")} />
+      <div className="mx-auto max-w-4xl px-4 pt-5 sm:px-6">
+        <section className="relative overflow-hidden rounded-[2rem] border border-amber-200 bg-gradient-to-br from-[#ffe7a7] via-[#fff8db] to-[#ffd98c] p-4 shadow-[0_24px_60px_rgba(245,158,11,0.18)] sm:p-7">
+          <div className="relative z-10 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 rounded-full border border-white/80 bg-white/85 px-4 py-2 text-xs font-black text-amber-800"><Clock3 size={16} /> Fokus & pilih</div>
+            <span className="rounded-full bg-white/85 px-4 py-2 text-xs font-black text-amber-800">Soal {currentIndex + 1} / {QUESTION_COUNT}</span>
           </div>
-          
-          <button 
-            onClick={() => announceTarget(target)}
-            className="relative z-10 w-28 h-28 bg-gradient-to-br from-cyan-400 to-blue-500 text-white rounded-full mx-auto flex items-center justify-center shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:scale-105 active:scale-95 transition-all"
-          >
-            <Volume2 size={48} />
-          </button>
 
-          <AnimatePresence>
-            {message && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.8, y: -10 }}
-                className={cn(
-                  "absolute -bottom-6 left-1/2 -translate-x-1/2 px-8 py-3 rounded-2xl font-bold text-white shadow-xl flex items-center gap-2 whitespace-nowrap z-20",
-                  status === 'correct' ? "bg-emerald-400" : "bg-orange-400"
-                )}
-              >
-                {status === 'correct' && <Trophy size={18} />}
-                {message}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+          <div className="relative z-10 mt-5 h-3 overflow-hidden rounded-full border border-white/80 bg-white/70"><div className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-lime-400 to-amber-400 transition-all" style={{ width: `${progress}%` }} /></div>
 
-        <div className="grid grid-cols-2 gap-4 md:gap-6 w-full">
-          {options.map((opt, i) => {
-            return (
-              <motion.button
-                key={i + opt.id}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={status === 'wrong' && opt.id !== target?.id ? { scale: 0.95, opacity: 0.3 } : { scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', delay: i * 0.08 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleGuess(opt)}
-                disabled={status === 'correct' || status === 'wrong' || hasGuessed}
-                className={cn(
-                  "aspect-square rounded-[2rem] flex flex-col items-center justify-center transition-all overflow-hidden relative cursor-pointer glass-panel border-2 border-amber-200 hover:border-amber-400",
-                  status === 'correct' && opt.id === target?.id ? "bg-emerald-100/60 border-emerald-400 shadow-[0_0_30px_rgba(52,211,153,0.2)]" : ""
-                )}
-              >
-                <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
-                <span className="text-7xl md:text-8xl font-black text-amber-700 drop-shadow-sm relative z-10 Arabic-Font" style={{ fontFamily: 'Scheherazade New, sans-serif' }}>
-                  {opt.arabic}
-                </span>
-              </motion.button>
-            );
-          })}
-        </div>
+          <motion.article key={target.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 mt-5 rounded-[1.8rem] border border-white/80 bg-white/90 p-6 text-center shadow-[0_22px_50px_rgba(180,83,9,0.12)] sm:p-8">
+            <p className="text-sm font-black text-slate-600">Huruf apakah ini?</p>
+            <p className="arabic-font mt-5 text-[7rem] font-black leading-none text-[#2f1b18] sm:text-[9rem]">{target.arabic}</p>
+            <button type="button" onClick={() => announceTarget(target)} className="kid-button mx-auto mt-6 flex items-center justify-center gap-2 rounded-full bg-amber-500 px-6 py-3 text-white shadow-lg shadow-amber-300/45"><Volume2 size={20} /> Dengarkan</button>
 
+            <AnimatePresence>
+              {status !== "playing" ? (
+                <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} className={`absolute left-1/2 top-5 flex -translate-x-1/2 items-center gap-2 rounded-full px-5 py-2 text-sm font-black text-white shadow-lg ${status === "correct" ? "bg-emerald-500" : "bg-rose-500"}`}>
+                  {status === "correct" ? <Check size={17} /> : <X size={17} />}{status === "correct" ? "Benar! 🎉" : `Jawabannya ${target.name}`}
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </motion.article>
+
+          <div className="relative z-10 mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {options.map((option, index) => {
+              const isTarget = option.id === target.id;
+              const feedback = status !== "playing" && isTarget ? "border-emerald-500 bg-emerald-100 text-emerald-800" : "border-white/80 bg-white/90 text-[#2f1b18] hover:border-amber-400 hover:bg-amber-50";
+              return (
+                <motion.button key={option.id} type="button" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: status === "wrong" && !isTarget ? 0.45 : 1, scale: 1 }} transition={{ delay: index * 0.05 }} whileHover={status === "playing" ? { y: -4 } : undefined} onClick={() => handleGuess(option)} disabled={status !== "playing"} className={`kid-button relative min-h-28 border-2 p-4 shadow-sm ${feedback}`}>
+                  <span className="arabic-font block text-5xl font-black">{option.arabic}</span>
+                  <span className="mt-2 block text-xs font-black">{option.name}</span>
+                </motion.button>
+              );
+            })}
+          </div>
+
+          <div className="relative z-10 mt-5 flex justify-center gap-3 text-xs font-black">
+            <span className="flex items-center gap-1 rounded-full bg-emerald-100 px-4 py-2 text-emerald-700"><Check size={15} /> {correctCount} benar</span>
+            <span className="flex items-center gap-1 rounded-full bg-rose-100 px-4 py-2 text-rose-700"><X size={15} /> {wrongCount} salah</span>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
