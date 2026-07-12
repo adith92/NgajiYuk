@@ -1,156 +1,72 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { motion } from "framer-motion";
-import {
-  BarChart3,
-  Bell,
-  BookA,
-  BookHeart,
-  Gamepad2,
-  Home,
-  LogOut,
-  Medal,
-  MoonStar,
-  Settings,
-  ShieldCheck,
-  Sparkles,
-  Star,
-  Trophy,
-  UserRound,
-} from "lucide-react";
+import { Bell, LogOut, Medal, Settings, Sparkles, Star, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MenuCard } from "@/components/MenuCard";
-import { useAppStore } from "@/lib/store";
-import { hijaiyahData } from "@/data/hijaiyah";
+import { LEARNING_MODULES, PRIMARY_NAVIGATION } from "@/config/app";
 import { doaData } from "@/data/doa";
+import { hijaiyahData } from "@/data/hijaiyah";
 import { sholatData } from "@/data/sholat";
+import { useRequireUser } from "@/hooks/useRequireUser";
+import { calculateLearningSummary, type UserProgressMap } from "@/lib/learning/progress";
+import { useAppStore } from "@/lib/store";
 
-const navItems = [
-  { label: "Beranda", icon: Home, href: "/dashboard", active: true },
-  { label: "Belajar", icon: BookHeart, href: "/hijaiyah" },
-  { label: "Favorit", icon: Star, href: "/doa" },
-  { label: "Kuis", icon: Trophy, href: "/kuis" },
-  { label: "Game", icon: Gamepad2, href: "/gamezone" },
-  { label: "Progress", icon: BarChart3, href: "/progress" },
-];
-
-function percentage(completed: number, total: number) {
-  if (!total) return 0;
-  return Math.min(100, Math.round((completed / total) * 100));
-}
+const MODULE_TOTALS = {
+  hijaiyah: hijaiyahData.length,
+  doa: doaData.length,
+  sholat: sholatData.length,
+} as const;
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { users, currentUserUid, progress, quizHistory, logout, initializeApp } = useAppStore();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    initializeApp();
-  }, [initializeApp]);
-
-  useEffect(() => {
-    if (mounted && !currentUserUid) router.replace("/");
-  }, [mounted, currentUserUid, router]);
+  const { currentUserUid, isReady } = useRequireUser();
+  const users = useAppStore((state) => state.users);
+  const progress = useAppStore((state) => state.progress);
+  const quizHistory = useAppStore((state) => state.quizHistory);
+  const logout = useAppStore((state) => state.logout);
 
   const currentUser = currentUserUid ? users[currentUserUid] : null;
-  const userProgress = currentUserUid ? progress[currentUserUid] ?? {} : {};
+  const userProgress: UserProgressMap = currentUserUid ? progress[currentUserUid] ?? {} : {};
   const userQuizHistory = currentUserUid ? quizHistory[currentUserUid] ?? [] : [];
+  const metrics = useMemo(
+    () => calculateLearningSummary(userProgress, userQuizHistory, MODULE_TOTALS),
+    [userProgress, userQuizHistory],
+  );
 
-  const metrics = useMemo(() => {
-    const hijaiyah = userProgress.hijaiyah?.completedItems.length ?? 0;
-    const doa = userProgress.doa?.completedItems.length ?? 0;
-    const sholat = userProgress.sholat?.completedItems.length ?? 0;
-    const totalPoints = Object.values(userProgress).reduce((sum, item) => sum + item.points, 0);
-    const lastQuiz = userQuizHistory[0];
-
-    return {
-      hijaiyah: percentage(hijaiyah, hijaiyahData.length),
-      doa: percentage(doa, doaData.length),
-      sholat: percentage(sholat, sholatData.length),
-      totalPoints,
-      lastQuiz: lastQuiz?.scorePercent ?? 0,
-      learnedDoa: doa,
-      sessions: userQuizHistory.length,
-    };
-  }, [userProgress, userQuizHistory]);
+  const moduleProgress = {
+    hijaiyah: metrics.hijaiyahPercent,
+    doa: metrics.doaPercent,
+    sholat: metrics.sholatPercent,
+    kuis: metrics.lastQuizPercent,
+    gamezone: undefined,
+    progress: undefined,
+  } satisfies Record<(typeof LEARNING_MODULES)[number]["id"], number | undefined>;
 
   const handleLogout = () => {
     logout();
     router.push("/");
   };
 
-  if (!mounted || !currentUserUid) {
+  if (!isReady || !currentUserUid) {
     return <div className="min-h-screen bg-[#f7f6ff]" aria-label="Memuat dashboard" />;
   }
-
-  const menuItems = [
-    {
-      title: "Hijaiyah",
-      description: "Belajar huruf Arab, dengarkan audio, dan tandai progresmu.",
-      icon: <BookA className="h-7 w-7" />,
-      href: "/hijaiyah",
-      tone: "green" as const,
-      eyebrow: "Belajar huruf Arab",
-      progress: metrics.hijaiyah,
-    },
-    {
-      title: "Doa Harian",
-      description: "Dengarkan, ucapkan, dan hafalkan doa untuk kegiatan sehari-hari.",
-      icon: <MoonStar className="h-7 w-7" />,
-      href: "/doa",
-      tone: "pink" as const,
-      eyebrow: "Doa sehari-hari",
-      progress: metrics.doa,
-    },
-    {
-      title: "Bacaan Sholat",
-      description: "Pelajari urutan bacaan sholat lengkap dengan latin dan arti.",
-      icon: <ShieldCheck className="h-7 w-7" />,
-      href: "/sholat",
-      tone: "blue" as const,
-      eyebrow: "Niat & bacaan",
-      progress: metrics.sholat,
-    },
-    {
-      title: "Kuis Hijaiyah",
-      description: "Uji pemahaman, raih skor tinggi, dan dapatkan waktu bermain.",
-      icon: <Trophy className="h-7 w-7" />,
-      href: "/kuis",
-      tone: "yellow" as const,
-      eyebrow: "Uji pemahaman",
-      progress: metrics.lastQuiz,
-    },
-    {
-      title: "Game Zone",
-      description: "Gunakan reward dari kuis untuk bermain sambil melatih fokus.",
-      icon: <Gamepad2 className="h-7 w-7" />,
-      href: "/gamezone",
-      tone: "purple" as const,
-      eyebrow: "Reward belajar",
-    },
-    {
-      title: "Progress & Poin",
-      description: "Lihat pencapaian setiap modul dan perkembangan belajar.",
-      icon: <BarChart3 className="h-7 w-7" />,
-      href: "/progress",
-      tone: "cyan" as const,
-      eyebrow: "Lihat perkembangan",
-    },
-  ];
 
   return (
     <main className="min-h-screen bg-[#f7f6ff] text-[#21164a] lg:grid lg:grid-cols-[92px_1fr]">
       <aside className="hidden min-h-screen flex-col items-center bg-gradient-to-b from-[#7442e8] via-[#5527ca] to-[#32158a] py-5 text-white shadow-[12px_0_35px_rgba(47,25,117,0.14)] lg:flex">
         <Link href="/dashboard" className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/16 text-2xl shadow-inner" aria-label="NgajiYuk">🌙</Link>
         <nav className="mt-8 flex flex-1 flex-col gap-2" aria-label="Navigasi utama">
-          {navItems.map(({ label, icon: Icon, href, active }) => (
-            <Link key={label} href={href} aria-label={label} className={`group flex h-12 w-12 items-center justify-center rounded-2xl transition-all ${active ? "bg-white text-violet-700 shadow-lg" : "text-violet-100 hover:bg-white/12 hover:text-white"}`}>
-              <Icon size={21} aria-hidden="true" />
-            </Link>
-          ))}
+          {PRIMARY_NAVIGATION.map(({ label, icon: Icon, href }) => {
+            const active = href === "/dashboard";
+            return (
+              <Link key={label} href={href} aria-label={label} className={`group flex h-12 w-12 items-center justify-center rounded-2xl transition-all ${active ? "bg-white text-violet-700 shadow-lg" : "text-violet-100 hover:bg-white/12 hover:text-white"}`}>
+                <Icon size={21} aria-hidden="true" />
+              </Link>
+            );
+          })}
         </nav>
         <button type="button" onClick={handleLogout} aria-label="Keluar dari profil" className="flex h-12 w-12 items-center justify-center rounded-2xl text-violet-100 transition-colors hover:bg-white/12 hover:text-white">
           <LogOut size={20} />
@@ -195,61 +111,54 @@ export default function DashboardPage() {
 
           <section className="mt-7">
             <div className="mb-4 flex items-end justify-between gap-4">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-500">Pilih aktivitas</p>
-                <h2 className="mt-1 text-2xl font-black tracking-tight">Mau belajar apa?</h2>
-              </div>
+              <div><p className="text-xs font-black uppercase tracking-[0.18em] text-violet-500">Pilih aktivitas</p><h2 className="mt-1 text-2xl font-black tracking-tight">Mau belajar apa?</h2></div>
               <Link href="/progress" className="text-sm font-black text-violet-600 hover:text-violet-800">Lihat progress →</Link>
             </div>
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {menuItems.map((item, index) => <MenuCard key={item.title} {...item} delay={0.05 * index} />)}
+              {LEARNING_MODULES.map((module, index) => {
+                const Icon = module.icon;
+                return (
+                  <MenuCard
+                    key={module.id}
+                    title={module.title}
+                    description={module.description}
+                    eyebrow={module.eyebrow}
+                    href={module.href}
+                    icon={<Icon className="h-7 w-7" />}
+                    tone={module.tone}
+                    progress={moduleProgress[module.id]}
+                    delay={0.05 * index}
+                  />
+                );
+              })}
             </div>
           </section>
 
           <section className="mt-7 grid gap-4 lg:grid-cols-[1fr_1.25fr]">
             <div className="app-card p-5 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.16em] text-violet-500">Ringkasan</p>
-                  <h2 className="mt-1 text-xl font-black">Pencapaianmu</h2>
-                </div>
-                <Medal className="text-amber-500" size={28} />
-              </div>
+              <div className="flex items-center justify-between"><div><p className="text-xs font-black uppercase tracking-[0.16em] text-violet-500">Ringkasan</p><h2 className="mt-1 text-xl font-black">Pencapaianmu</h2></div><Medal className="text-amber-500" size={28} /></div>
               <div className="mt-5 grid grid-cols-3 gap-3">
                 {[
-                  { value: metrics.lastQuiz ? `${metrics.lastQuiz}%` : "-", label: "Kuis terakhir", icon: "🔥" },
+                  { value: metrics.lastQuizPercent ? `${metrics.lastQuizPercent}%` : "-", label: "Kuis terakhir", icon: "🔥" },
                   { value: metrics.learnedDoa, label: "Doa dipelajari", icon: "🤲" },
-                  { value: metrics.sessions, label: "Sesi kuis", icon: "🎮" },
+                  { value: metrics.quizSessions, label: "Sesi kuis", icon: "🎮" },
                 ].map((item) => (
-                  <div key={item.label} className="rounded-2xl bg-violet-50 p-3 text-center">
-                    <span className="text-xl">{item.icon}</span>
-                    <p className="mt-2 text-xl font-black text-violet-800">{item.value}</p>
-                    <p className="mt-1 text-[10px] font-bold leading-4 text-slate-500">{item.label}</p>
-                  </div>
+                  <div key={item.label} className="rounded-2xl bg-violet-50 p-3 text-center"><span className="text-xl">{item.icon}</span><p className="mt-2 text-xl font-black text-violet-800">{item.value}</p><p className="mt-1 text-[10px] font-bold leading-4 text-slate-500">{item.label}</p></div>
                 ))}
               </div>
             </div>
 
             <div className="app-card p-5 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.16em] text-violet-500">Progress belajar</p>
-                  <h2 className="mt-1 text-xl font-black">Teruskan perjalanan</h2>
-                </div>
-                <UserRound className="text-violet-500" size={26} />
-              </div>
+              <div className="flex items-center justify-between"><div><p className="text-xs font-black uppercase tracking-[0.16em] text-violet-500">Progress belajar</p><h2 className="mt-1 text-xl font-black">Teruskan perjalanan</h2></div><UserRound className="text-violet-500" size={26} /></div>
               <div className="mt-5 space-y-4">
                 {[
-                  { label: "Hijaiyah", value: metrics.hijaiyah, color: "from-emerald-400 to-lime-400", icon: "ا" },
-                  { label: "Doa Harian", value: metrics.doa, color: "from-pink-400 to-rose-400", icon: "🤲" },
-                  { label: "Bacaan Sholat", value: metrics.sholat, color: "from-blue-400 to-cyan-400", icon: "🕌" },
+                  { label: "Hijaiyah", value: metrics.hijaiyahPercent, color: "from-emerald-400 to-lime-400", icon: "ا" },
+                  { label: "Doa Harian", value: metrics.doaPercent, color: "from-pink-400 to-rose-400", icon: "🤲" },
+                  { label: "Bacaan Sholat", value: metrics.sholatPercent, color: "from-blue-400 to-cyan-400", icon: "🕌" },
                 ].map((item) => (
                   <div key={item.label} className="grid grid-cols-[32px_1fr_42px] items-center gap-3">
                     <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-violet-50 text-sm font-black">{item.icon}</span>
-                    <div>
-                      <div className="mb-1.5 flex items-center justify-between text-xs font-black"><span>{item.label}</span></div>
-                      <div className="h-2.5 overflow-hidden rounded-full bg-violet-50"><div className={`h-full rounded-full bg-gradient-to-r ${item.color}`} style={{ width: `${item.value}%` }} /></div>
-                    </div>
+                    <div><div className="mb-1.5 flex items-center justify-between text-xs font-black"><span>{item.label}</span></div><div className="h-2.5 overflow-hidden rounded-full bg-violet-50"><div className={`h-full rounded-full bg-gradient-to-r ${item.color}`} style={{ width: `${item.value}%` }} /></div></div>
                     <span className="text-right text-xs font-black text-slate-500">{item.value}%</span>
                   </div>
                 ))}
@@ -259,9 +168,10 @@ export default function DashboardPage() {
         </div>
 
         <nav className="fixed inset-x-3 bottom-3 z-50 flex items-center justify-around rounded-2xl border border-white/20 bg-[#4d26bd]/95 px-2 py-2 text-white shadow-2xl backdrop-blur-xl lg:hidden" aria-label="Navigasi mobile">
-          {navItems.slice(0, 5).map(({ label, icon: Icon, href, active }) => (
-            <Link key={label} href={href} aria-label={label} className={`flex h-11 w-11 items-center justify-center rounded-xl ${active ? "bg-white text-violet-700" : "text-violet-100"}`}><Icon size={20} /></Link>
-          ))}
+          {PRIMARY_NAVIGATION.slice(0, 5).map(({ label, icon: Icon, href }) => {
+            const active = href === "/dashboard";
+            return <Link key={label} href={href} aria-label={label} className={`flex h-11 w-11 items-center justify-center rounded-xl ${active ? "bg-white text-violet-700" : "text-violet-100"}`}><Icon size={20} /></Link>;
+          })}
           <button type="button" onClick={handleLogout} aria-label="Keluar" className="flex h-11 w-11 items-center justify-center rounded-xl text-violet-100"><LogOut size={20} /></button>
         </nav>
       </div>
