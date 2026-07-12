@@ -30,6 +30,15 @@ export function createQuizQuestion<T extends IdentifiableLearningItem>(
   return { options, target };
 }
 
+export function createQuizSessionId(
+  now: () => number = Date.now,
+  random: () => number = Math.random,
+): string {
+  const timestamp = now().toString(36);
+  const entropy = Math.floor(random() * 1_000_000_000).toString(36);
+  return `quiz-${timestamp}-${entropy}`;
+}
+
 export function createQuizProgressItemId(sessionId: string, questionIndex: number): string {
   return `${sessionId}-question-${questionIndex + 1}`;
 }
