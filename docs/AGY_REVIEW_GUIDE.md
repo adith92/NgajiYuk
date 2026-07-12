@@ -45,7 +45,7 @@ npm test
 npm run build
 ```
 
-CI harus hijau sebelum status Draft diubah menjadi Ready for review.
+CI harus hijau sebelum status Draft diubah menjadi Ready for review. Gunakan hasil pada commit head terbaru, bukan workflow lama dari commit sebelum perbaikan.
 
 ## ⛔ Larangan merge
 
