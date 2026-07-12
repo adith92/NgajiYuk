@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronLeft, ChevronRight, Heart, Loader2, Mic, MicOff, Volume2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -18,7 +18,10 @@ function celebrate() {
 export default function DoaPage() {
   const router = useRouter();
   const { currentUserUid, progress, updateProgress } = useAppStore();
-  const completed = currentUserUid ? progress[currentUserUid]?.doa?.completedItems ?? [] : [];
+  const completed = useMemo(
+    () => (currentUserUid ? progress[currentUserUid]?.doa?.completedItems ?? [] : []),
+    [currentUserUid, progress],
+  );
   const [activeIndex, setActiveIndex] = useState(0);
   const activeDoa = doaData[activeIndex];
   const isDone = completed.includes(activeDoa.id);
@@ -30,7 +33,9 @@ export default function DoaPage() {
 
   const speech = useSpeechPractice({ threshold: 0.7, language: "ar-SA", onMatched: handleSpeechMatch });
 
-  useEffect(() => () => confetti.reset(), []);
+  useEffect(() => () => {
+    confetti.reset();
+  }, []);
 
   const move = (direction: number) => {
     speech.stop();

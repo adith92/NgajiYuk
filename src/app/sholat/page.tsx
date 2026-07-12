@@ -23,7 +23,9 @@ export default function SholatPage() {
   const activeItem = sholatData[activeIndex];
   const isDone = completed.includes(activeItem.id);
 
-  useEffect(() => () => confetti.reset(), []);
+  useEffect(() => () => {
+    confetti.reset();
+  }, []);
 
   const move = (direction: number) => setActiveIndex((current) => (current + direction + sholatData.length) % sholatData.length);
   const markComplete = () => {

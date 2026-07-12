@@ -28,7 +28,9 @@ export default function HijaiyahPage() {
   const isDone = completed.includes(activeChar.id);
   const progressPercent = Math.round((completed.length / hijaiyahData.length) * 100);
 
-  useEffect(() => () => confetti.reset(), []);
+  useEffect(() => () => {
+    confetti.reset();
+  }, []);
 
   const move = (direction: number) => {
     setActiveIndex((current) => (current + direction + hijaiyahData.length) % hijaiyahData.length);

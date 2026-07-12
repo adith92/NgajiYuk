@@ -44,7 +44,9 @@ export default function GameZonePage() {
     return () => window.clearInterval(interval);
   }, [getGameZoneStatus, lockGameZone]);
 
-  useEffect(() => () => confetti.reset(), []);
+  useEffect(() => () => {
+    confetti.reset();
+  }, []);
 
   const tapStar = () => {
     setScore((value) => {

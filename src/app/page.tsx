@@ -31,8 +31,7 @@ const featureRows = [
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, initializeApp, currentUserUid } = useAppStore();
-  const [mounted, setMounted] = useState(false);
+  const { login, initializeApp, currentUserUid, isReady } = useAppStore();
   const [viewMode, setViewMode] = useState<"profiles" | "email-login">("profiles");
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
@@ -42,13 +41,12 @@ export default function LoginPage() {
   const supabaseReady = isSupabaseConfigured();
 
   useEffect(() => {
-    setMounted(true);
     initializeApp();
   }, [initializeApp]);
 
   useEffect(() => {
-    if (mounted && currentUserUid) router.replace("/dashboard");
-  }, [mounted, currentUserUid, router]);
+    if (isReady && currentUserUid) router.replace("/dashboard");
+  }, [isReady, currentUserUid, router]);
 
   const handleProfileSelect = (uid: string, name: string) => {
     login(uid, name);
@@ -101,7 +99,7 @@ export default function LoginPage() {
     }
   };
 
-  if (!mounted) return <div className="min-h-screen bg-[#21105f]" aria-label="Memuat NgajiYuk" />;
+  if (!isReady) return <div className="min-h-screen bg-[#21105f]" aria-label="Memuat NgajiYuk" />;
 
   return (
     <main className="min-h-screen bg-[#170c48] p-3 text-white sm:p-5 lg:p-7">

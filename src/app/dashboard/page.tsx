@@ -29,12 +29,11 @@ export default function DashboardPage() {
   const logout = useAppStore((state) => state.logout);
 
   const currentUser = currentUserUid ? users[currentUserUid] : null;
-  const userProgress: UserProgressMap = currentUserUid ? progress[currentUserUid] ?? {} : {};
-  const userQuizHistory = currentUserUid ? quizHistory[currentUserUid] ?? [] : [];
-  const metrics = useMemo(
-    () => calculateLearningSummary(userProgress, userQuizHistory, MODULE_TOTALS),
-    [userProgress, userQuizHistory],
-  );
+  const metrics = useMemo(() => {
+    const userProgress: UserProgressMap = currentUserUid ? progress[currentUserUid] ?? {} : {};
+    const userQuizHistory = currentUserUid ? quizHistory[currentUserUid] ?? [] : [];
+    return calculateLearningSummary(userProgress, userQuizHistory, MODULE_TOTALS);
+  }, [currentUserUid, progress, quizHistory]);
 
   const moduleProgress = {
     hijaiyah: metrics.hijaiyahPercent,

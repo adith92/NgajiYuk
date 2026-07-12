@@ -21,7 +21,7 @@ export function stringSimilarity(s1: string, s2: string): number {
   const longerLength = longer.length;
   if (longerLength === 0) return 1.0;
   
-  const costs = new Array();
+  const costs: number[] = [];
   for (let i = 0; i <= longer.length; i++) {
     let lastValue = i;
     for (let j = 0; j <= shorter.length; j++) {

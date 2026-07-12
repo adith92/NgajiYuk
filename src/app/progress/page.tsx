@@ -24,8 +24,14 @@ export default function ProgressPage() {
   const progress = useAppStore((state) => state.progress);
   const quizHistory = useAppStore((state) => state.quizHistory);
 
-  const userProgress: UserProgressMap = currentUserUid ? progress[currentUserUid] ?? {} : {};
-  const history = currentUserUid ? quizHistory[currentUserUid] ?? [] : [];
+  const userProgress = useMemo<UserProgressMap>(
+    () => (currentUserUid ? progress[currentUserUid] ?? {} : {}),
+    [currentUserUid, progress],
+  );
+  const history = useMemo(
+    () => (currentUserUid ? quizHistory[currentUserUid] ?? [] : []),
+    [currentUserUid, quizHistory],
+  );
   const summary = useMemo(
     () => calculateLearningSummary(userProgress, history, MODULE_TOTALS),
     [history, userProgress],

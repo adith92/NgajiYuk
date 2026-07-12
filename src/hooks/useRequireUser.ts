@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/lib/store";
 
@@ -8,20 +8,19 @@ export function useRequireUser() {
   const router = useRouter();
   const currentUserUid = useAppStore((state) => state.currentUserUid);
   const initializeApp = useAppStore((state) => state.initializeApp);
-  const [hydrated, setHydrated] = useState(false);
+  const storeReady = useAppStore((state) => state.isReady);
 
   useEffect(() => {
     initializeApp();
-    setHydrated(true);
   }, [initializeApp]);
 
   useEffect(() => {
-    if (hydrated && !currentUserUid) router.replace("/");
-  }, [currentUserUid, hydrated, router]);
+    if (storeReady && !currentUserUid) router.replace("/");
+  }, [currentUserUid, storeReady, router]);
 
   return {
     currentUserUid,
-    hydrated,
-    isReady: hydrated && Boolean(currentUserUid),
+    hydrated: storeReady,
+    isReady: storeReady && Boolean(currentUserUid),
   };
 }
