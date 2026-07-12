@@ -8,7 +8,7 @@ import confetti from "canvas-confetti";
 import { Header } from "@/components/Header";
 import { hijaiyahData } from "@/data/hijaiyah";
 import { playAudio } from "@/lib/audioCache";
-import { createQuizProgressItemId, createQuizQuestion } from "@/lib/learning/quiz";
+import { createQuizProgressItemId, createQuizQuestion, createQuizSessionId } from "@/lib/learning/quiz";
 import { useAppStore, type QuizHistory } from "@/lib/store";
 
 type HijaiyahItem = (typeof hijaiyahData)[number];
@@ -58,7 +58,7 @@ export default function KuisPage() {
   };
 
   const getSessionId = () => {
-    if (!sessionIdRef.current) sessionIdRef.current = `quiz-${Date.now()}`;
+    if (!sessionIdRef.current) sessionIdRef.current = createQuizSessionId();
     return sessionIdRef.current;
   };
 
@@ -83,7 +83,7 @@ export default function KuisPage() {
   };
 
   const resetQuiz = () => {
-    sessionIdRef.current = `quiz-${Date.now()}`;
+    sessionIdRef.current = createQuizSessionId();
     setQuestion(createQuizQuestion(hijaiyahData));
     setStatus("playing");
     setCurrentIndex(0);
