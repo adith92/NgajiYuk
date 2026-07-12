@@ -1,0 +1,46 @@
+name: Apply one-time CI fixes
+
+on:
+  push:
+    branches:
+      - test/ci-quality-gates
+
+permissions:
+  contents: write
+
+concurrency:
+  group: one-time-ci-fixes
+  cancel-in-progress: true
+
+jobs:
+  apply:
+    name: Apply deterministic fixes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout testing branch
+        uses: actions/checkout@v4
+        with:
+          ref: test/ci-quality-gates
+          fetch-depth: 0
+
+      - name: Apply fixes
+        run: node scripts/apply-ci-fixes.mjs
+
+      - name: Remove temporary automation
+        run: |
+          rm -f scripts/apply-ci-fixes.mjs
+          rm -f .github/workflows/apply-ci-fixes.yml
+
+      - name: Commit branch-only fixes
+        run: |
+          git config user.name "NgajiYuk CI Fixer"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes required"
+            exit 0
+          fi
+          git commit -m "fix(ci): resolve lint and hydration findings"
+          git push origin HEAD:test/ci-quality-gates
