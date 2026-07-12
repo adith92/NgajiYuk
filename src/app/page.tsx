@@ -1,18 +1,72 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, LogIn, UserPlus, Sparkles, ChevronRight, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  ArrowLeft,
+  BookOpen,
+  ChevronRight,
+  Gamepad2,
+  HeartHandshake,
+  LockKeyhole,
+  LogIn,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Trophy,
+  UserPlus,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useAppStore } from "@/lib/store";
 import Image from "next/image";
+import { useAppStore } from "@/lib/store";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+
+const profiles = [
+  {
+    uid: "abeel-uid",
+    name: "Abeel",
+    avatar: "👦",
+    label: "Sobat Hijaiyah",
+    card: "border-sky-200 bg-sky-50 hover:border-sky-400",
+    avatarBg: "from-sky-300 to-blue-500",
+  },
+  {
+    uid: "emily-uid",
+    name: "Emily",
+    avatar: "👧",
+    label: "Sobat Doa",
+    card: "border-pink-200 bg-pink-50 hover:border-pink-400",
+    avatarBg: "from-pink-300 to-rose-500",
+  },
+  {
+    uid: "emier-uid",
+    name: "Emier",
+    avatar: "👶",
+    label: "Sobat Kuis",
+    card: "border-emerald-200 bg-emerald-50 hover:border-emerald-400",
+    avatarBg: "from-emerald-300 to-teal-500",
+  },
+  {
+    uid: "bunda-uma-uid",
+    name: "Bunda Uma",
+    avatar: "🧕",
+    label: "Pembimbing",
+    card: "border-violet-200 bg-violet-50 hover:border-violet-400",
+    avatarBg: "from-violet-300 to-purple-600",
+  },
+] as const;
+
+const featureRows = [
+  { icon: "ا", title: "Hijaiyah", description: "Belajar huruf Arab dengan suara" },
+  { icon: "🤲", title: "Doa Harian", description: "Doa pilihan untuk aktivitas sehari-hari" },
+  { icon: "🕌", title: "Bacaan Sholat", description: "Niat, bacaan, latin, dan artinya" },
+  { icon: "🏆", title: "Kuis & Game Zone", description: "Belajar, kumpulkan poin, lalu bermain" },
+];
 
 export default function LoginPage() {
   const router = useRouter();
   const { login, initializeApp, currentUserUid } = useAppStore();
   const [mounted, setMounted] = useState(false);
-  
-  // View states: 'profiles' | 'email-login'
   const [viewMode, setViewMode] = useState<"profiles" | "email-login">("profiles");
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
@@ -23,252 +77,195 @@ export default function LoginPage() {
     initializeApp();
   }, [initializeApp]);
 
-  // Auto redirect if already logged in
   useEffect(() => {
-    if (mounted && currentUserUid) {
-      router.push("/dashboard");
-    }
+    if (mounted && currentUserUid) router.replace("/dashboard");
   }, [mounted, currentUserUid, router]);
-
-  const profiles = [
-    { 
-      uid: "abeel-uid", 
-      name: "Abeel", 
-      avatar: "👦", 
-      bgGradient: "from-sky-300 to-blue-400", 
-      borderColor: "border-sky-300",
-      textColor: "text-sky-600",
-      shadowColor: "shadow-sky-200/50",
-      description: "Sobat Hijaiyah 🌟" 
-    },
-    { 
-      uid: "emily-uid", 
-      name: "Emily", 
-      avatar: "👧", 
-      bgGradient: "from-pink-300 to-rose-400", 
-      borderColor: "border-pink-300",
-      textColor: "text-pink-600",
-      shadowColor: "shadow-pink-200/50",
-      description: "Sobat Doa ✨" 
-    },
-    { 
-      uid: "emier-uid", 
-      name: "Emier", 
-      avatar: "👶", 
-      bgGradient: "from-emerald-300 to-teal-400", 
-      borderColor: "border-emerald-300",
-      textColor: "text-emerald-600",
-      shadowColor: "shadow-emerald-200/50",
-      description: "Sobat Kuis 🎮" 
-    },
-    { 
-      uid: "bunda-uma-uid", 
-      name: "Bunda Uma", 
-      avatar: "🧕", 
-      bgGradient: "from-amber-300 to-orange-400", 
-      borderColor: "border-amber-300",
-      textColor: "text-amber-600",
-      shadowColor: "shadow-amber-200/50",
-      description: "Pembimbing Utama ❤️" 
-    },
-  ];
 
   const handleProfileSelect = (uid: string, name: string) => {
     login(uid, name);
     router.push("/dashboard");
   };
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Simulate auth, fallback to dashboard
-    login("email-user", email.split("@")[0]);
+  const handleEmailSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    login("email-user", email.split("@")[0] || "Sobat");
     router.push("/dashboard");
   };
 
-  if (!mounted) return null;
+  if (!mounted) {
+    return <div className="min-h-screen bg-[#21105f]" aria-label="Memuat NgajiYuk" />;
+  }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
-      {/* Decorative Floating Elements */}
-      <div className="absolute top-16 left-10 text-4xl animate-bounce" style={{ animationDelay: '0s', animationDuration: '3s' }}>⭐</div>
-      <div className="absolute top-32 right-16 text-3xl animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '4s' }}>🌙</div>
-      <div className="absolute bottom-20 left-20 text-3xl animate-bounce" style={{ animationDelay: '1s', animationDuration: '3.5s' }}>📖</div>
-      <div className="absolute bottom-32 right-12 text-4xl animate-bounce" style={{ animationDelay: '1.5s', animationDuration: '4.5s' }}>🕌</div>
-      <div className="absolute top-1/2 left-4 text-2xl animate-bounce" style={{ animationDelay: '2s', animationDuration: '5s' }}>🌟</div>
-
-      {/* Main Glass Panel */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8 }}
-        className="w-full max-w-5xl glass-panel rounded-[32px] overflow-hidden grid grid-cols-1 lg:grid-cols-12 shadow-2xl border-2 border-white/60 backdrop-blur-xl relative z-10"
-      >
-        {/* Left Column: Kids-friendly Quran reading Illustration */}
-        <div className="lg:col-span-6 bg-gradient-to-br from-sky-50/80 to-violet-50/80 p-6 md:p-12 flex flex-col justify-between items-center text-center border-b lg:border-b-0 lg:border-r border-white/40">
-          <div className="flex items-center gap-2 mb-6 lg:mb-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-300/30">
-              <BookOpen className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-2xl font-bold text-slate-700 tracking-wider">NgajiYuk</span>
-          </div>
-
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="my-4 relative w-64 h-64 md:w-80 md:h-80 lg:w-[350px] lg:h-[350px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/50"
-          >
-            <Image
-              src="/images/quran-kids.png"
-              alt="Anak Belajar Quran"
-              fill
-              className="object-cover object-center"
-              priority
-            />
-            {/* Soft Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-white/30 via-transparent to-transparent" />
-          </motion.div>
-
-          <div className="mt-4">
-            <h2 className="text-xl md:text-2xl font-bold text-slate-700 tracking-wide flex items-center justify-center gap-2">
-              Belajar Qur&apos;an Jadi Seru! <Sparkles className="w-5 h-5 text-amber-400 fill-amber-400 animate-pulse" />
-            </h2>
-            <p className="text-slate-500 text-sm mt-2 max-w-sm">
-              Yuk belajar Hijaiyah, Doa Harian, dan Tata Cara Sholat dengan cara menyenangkan bersama keluarga.
-            </p>
-          </div>
+    <main className="min-h-screen bg-[#170c48] p-3 text-white sm:p-5 lg:p-7">
+      <div className="purple-grid relative mx-auto grid min-h-[calc(100vh-1.5rem)] max-w-[1480px] overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#32158a] via-[#21105f] to-[#0f1d59] shadow-[0_35px_100px_rgba(10,3,48,0.5)] lg:grid-cols-[0.88fr_1.12fr]">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <span className="absolute left-[8%] top-[11%] text-2xl animate-twinkle">✦</span>
+          <span className="absolute left-[42%] top-[5%] text-amber-300 animate-twinkle">✦</span>
+          <span className="absolute bottom-[17%] left-[35%] text-violet-200 animate-twinkle">✧</span>
+          <span className="absolute right-[7%] top-[16%] text-sky-200 animate-twinkle">✦</span>
+          <div className="absolute -left-16 top-1/4 h-60 w-60 rounded-full bg-violet-500/20 blur-3xl" />
+          <div className="absolute -right-20 bottom-10 h-72 w-72 rounded-full bg-sky-400/15 blur-3xl" />
         </div>
 
-        {/* Right Column: Interactive Login Area */}
-        <div className="lg:col-span-6 p-6 md:p-12 flex flex-col justify-center min-h-[500px]">
+        <section className="relative z-10 flex flex-col justify-between p-6 sm:p-9 lg:p-12 xl:p-14">
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300 to-orange-500 text-2xl shadow-lg shadow-orange-500/25">🌙</div>
+              <div>
+                <p className="text-2xl font-black tracking-tight">NgajiYuk</p>
+                <p className="text-xs font-semibold text-violet-200">Belajar Islam seru & menyenangkan</p>
+              </div>
+            </div>
+
+            <div className="mt-12 max-w-xl lg:mt-20">
+              <StatusBadge tone="amber" icon={<Sparkles size={13} />}>
+                Ruang belajar keluarga
+              </StatusBadge>
+              <h1 className="mt-5 text-balance text-4xl font-black leading-[1.08] tracking-tight sm:text-5xl xl:text-6xl">
+                Belajar Islam Jadi <span className="text-amber-300">Lebih Seru!</span> ✨
+              </h1>
+              <p className="mt-5 max-w-lg text-base font-medium leading-7 text-violet-100 sm:text-lg">
+                Belajar Hijaiyah, doa harian, bacaan sholat, kuis, dan reward dalam pengalaman yang hangat untuk anak dan keluarga.
+              </p>
+            </div>
+
+            <div className="mt-8 grid gap-3 sm:grid-cols-3">
+              {[
+                { icon: ShieldCheck, title: "Aman & Ramah", text: "Untuk Anak" },
+                { icon: HeartHandshake, title: "Belajar Bersama", text: "Dengan Keluarga" },
+                { icon: Trophy, title: "Reward Positif", text: "Motivasi Belajar" },
+              ].map(({ icon: Icon, title, text }) => (
+                <div key={title} className="rounded-2xl border border-white/15 bg-white/8 p-4 backdrop-blur-sm">
+                  <Icon className="text-amber-300" size={22} />
+                  <p className="mt-3 text-sm font-black">{title}</p>
+                  <p className="text-xs font-medium text-violet-200">{text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-10 hidden items-end gap-4 lg:flex">
+            <div className="relative h-36 w-44 overflow-hidden rounded-[1.75rem] border border-white/15 bg-white/10 shadow-2xl">
+              <Image src="/images/quran-kids.png" alt="Anak belajar Al-Qur'an" fill className="object-cover" priority />
+            </div>
+            <p className="max-w-xs pb-2 text-xs font-semibold leading-5 text-violet-200">
+              Konten pembelajaran agama ditampilkan dengan penanda status review agar orang tua mengetahui materi yang masih perlu diverifikasi. 🛡️
+            </p>
+          </div>
+        </section>
+
+        <section className="relative z-10 m-3 rounded-[1.7rem] bg-[#f8f7ff] p-5 text-[#20164a] shadow-2xl sm:m-5 sm:p-8 lg:m-6 lg:p-10">
           <AnimatePresence mode="wait">
             {viewMode === "profiles" ? (
-              <motion.div
-                key="profiles"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.4 }}
-                className="space-y-8"
-              >
-                <div className="text-center lg:text-left">
-                  <span className="text-amber-500 text-sm font-semibold tracking-widest uppercase">Auto Login Profil</span>
-                  <h1 className="text-3xl font-extrabold text-slate-700 mt-1">Siapa yang mau belajar?</h1>
-                  <p className="text-slate-500 text-sm mt-2">Pilih profil anak di bawah ini untuk langsung masuk</p>
+              <motion.div key="profiles" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} className="flex min-h-full flex-col">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-500">Multi profil keluarga</p>
+                    <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Siapa yang mau belajar?</h2>
+                    <p className="mt-2 text-sm font-medium text-slate-500">Pilih profil untuk melanjutkan progres masing-masing.</p>
+                  </div>
+                  <div className="hidden h-14 w-14 items-center justify-center rounded-2xl bg-violet-100 text-2xl sm:flex">👋</div>
                 </div>
 
-                {/* Profiles Grid */}
-                <div className="grid grid-cols-2 gap-4">
-                  {profiles.map((profile, i) => (
+                <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
+                  {profiles.map((profile, index) => (
                     <motion.button
                       key={profile.uid}
-                      initial={{ opacity: 0, y: 15 }}
+                      type="button"
+                      initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 * i, type: "spring", stiffness: 100 }}
-                      whileHover={{ scale: 1.04, y: -4 }}
-                      whileTap={{ scale: 0.96 }}
+                      transition={{ delay: index * 0.06 }}
+                      whileHover={{ y: -4 }}
+                      whileTap={{ scale: 0.97 }}
                       onClick={() => handleProfileSelect(profile.uid, profile.name)}
-                      className={`glass-panel p-5 rounded-2xl border-2 ${profile.borderColor} hover:shadow-xl ${profile.shadowColor} transition-all flex flex-col items-center text-center group relative overflow-hidden`}
+                      className={`kid-button min-h-44 border-2 p-4 text-center shadow-sm transition-all hover:shadow-lg ${profile.card}`}
                     >
-                      {/* Avatar Orb with custom gradient */}
-                      <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${profile.bgGradient} flex items-center justify-center text-3xl shadow-lg group-hover:scale-110 transition-transform duration-300 relative z-10`}>
-                        {profile.avatar}
-                      </div>
-
-                      {/* Sparkle effects on hover */}
-                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Sparkles className="w-4 h-4 text-amber-400" />
-                      </div>
-
-                      <span className="text-slate-700 font-bold text-lg mt-4 block relative z-10">{profile.name}</span>
-                      <span className={`text-xs mt-1 block font-medium ${profile.textColor} relative z-10`}>
-                        {profile.description}
-                      </span>
+                      <span className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br text-3xl shadow-md ${profile.avatarBg}`}>{profile.avatar}</span>
+                      <span className="mt-3 block text-base font-black">{profile.name}</span>
+                      <span className="mt-1 block text-[11px] font-bold text-slate-500">{profile.label}</span>
                     </motion.button>
                   ))}
                 </div>
 
-                <div className="text-center pt-2">
-                  <button
-                    onClick={() => setViewMode("email-login")}
-                    className="text-xs text-slate-500 hover:text-slate-700 transition-colors py-2 px-4 rounded-full border border-slate-200 hover:border-slate-300 bg-white/50 flex items-center gap-1 mx-auto"
-                  >
-                    Masuk manual dengan Email <ChevronRight className="w-3 h-3" />
-                  </button>
+                <div className="mt-8 grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
+                  <div className="app-card p-5">
+                    <div className="mb-4 flex items-center gap-2">
+                      <BookOpen className="text-violet-600" size={20} />
+                      <h3 className="font-black">Fitur Utama</h3>
+                    </div>
+                    <div className="space-y-3">
+                      {featureRows.map((feature) => (
+                        <div key={feature.title} className="flex items-center gap-3 rounded-xl bg-violet-50/70 p-3">
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-lg font-black text-violet-700 shadow-sm">{feature.icon}</span>
+                          <div>
+                            <p className="text-sm font-black">{feature.title}</p>
+                            <p className="text-[11px] font-medium text-slate-500">{feature.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-4">
+                    <div className="app-card flex items-start gap-3 bg-emerald-50 p-5">
+                      <ShieldCheck className="mt-0.5 shrink-0 text-emerald-600" size={24} />
+                      <div>
+                        <p className="font-black text-emerald-800">Konten Terverifikasi</p>
+                        <p className="mt-1 text-xs font-medium leading-5 text-emerald-700">Sebagian konten masih ditandai dalam proses review sumber dan ustadz.</p>
+                      </div>
+                    </div>
+
+                    <button type="button" onClick={() => setViewMode("email-login")} className="kid-button flex items-center justify-between rounded-2xl bg-gradient-to-r from-violet-600 to-purple-700 px-5 py-4 text-left text-white shadow-lg shadow-violet-300/35">
+                      <span>
+                        <span className="block text-sm font-black">Masuk dengan email</span>
+                        <span className="block text-[11px] font-semibold text-violet-100">Mode akun masih dalam pengembangan</span>
+                      </span>
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             ) : (
-              <motion.div
-                key="email-login"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.4 }}
-                className="space-y-6"
-              >
-                <div className="text-center lg:text-left">
-                  <h1 className="text-3xl font-extrabold text-slate-700">Masuk Aplikasi</h1>
-                  <p className="text-slate-500 text-sm mt-2">Gunakan email & password terdaftar</p>
+              <motion.div key="email" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} className="mx-auto flex min-h-full w-full max-w-lg flex-col justify-center py-8">
+                <button type="button" onClick={() => setViewMode("profiles")} className="mb-7 flex w-fit items-center gap-2 text-sm font-black text-violet-600 hover:text-violet-800">
+                  <ArrowLeft size={18} /> Kembali ke profil
+                </button>
+
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-100 text-violet-700">
+                  <LockKeyhole size={28} />
                 </div>
+                <h2 className="mt-5 text-3xl font-black">{isLogin ? "Masuk akun" : "Daftar akun"}</h2>
+                <p className="mt-2 text-sm font-medium leading-6 text-slate-500">Saat ini form menggunakan sesi demo lokal. Integrasi autentikasi cloud sedang disiapkan.</p>
 
-                <form onSubmit={handleEmailSubmit} className="space-y-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-600 ml-1">Email</label>
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-white/70 border border-sky-200 rounded-xl px-4 py-3 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-300/50 focus:border-sky-400 transition-all text-sm"
-                      placeholder="nama@email.com"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-600 ml-1">Password</label>
-                    <input
-                      type="password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-white/70 border border-violet-200 rounded-xl px-4 py-3 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-300/50 focus:border-violet-400 transition-all text-sm"
-                      placeholder="••••••••"
-                    />
-                  </div>
-
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    type="submit"
-                    className="w-full mt-6 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-amber-300/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    {isLogin ? (
-                      <>Masuk <LogIn className="w-4 h-4" /></>
-                    ) : (
-                      <>Daftar <UserPlus className="w-4 h-4" /></>
-                    )}
-                  </motion.button>
+                <form onSubmit={handleEmailSubmit} className="mt-7 space-y-4">
+                  <label className="block text-sm font-black text-slate-700">
+                    Email
+                    <input type="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="nama@email.com" className="mt-2 w-full rounded-2xl border border-violet-200 bg-white px-4 py-3.5 text-sm font-medium text-slate-800 shadow-sm focus:border-violet-500" />
+                  </label>
+                  <label className="block text-sm font-black text-slate-700">
+                    Password
+                    <input type="password" required value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Minimal 8 karakter" className="mt-2 w-full rounded-2xl border border-violet-200 bg-white px-4 py-3.5 text-sm font-medium text-slate-800 shadow-sm focus:border-violet-500" />
+                  </label>
+                  <button type="submit" className="kid-button flex w-full items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-700 px-5 py-3.5 text-white shadow-lg shadow-violet-300/35">
+                    {isLogin ? <LogIn size={18} /> : <UserPlus size={18} />}
+                    {isLogin ? "Masuk dalam mode demo" : "Daftar dalam mode demo"}
+                  </button>
                 </form>
 
-                <div className="flex flex-col gap-3 items-center text-center mt-6">
-                  <button
-                    onClick={() => setIsLogin(!isLogin)}
-                    className="text-xs text-slate-500 hover:text-slate-700 transition-colors"
-                  >
-                    {isLogin ? "Belum punya akun? Daftar di sini" : "Sudah punya akun? Masuk"}
-                  </button>
-                  <button
-                    onClick={() => setViewMode("profiles")}
-                    className="text-xs text-amber-500 hover:text-amber-600 font-semibold transition-colors mt-2"
-                  >
-                    ← Kembali ke Pilih Profil Anak
-                  </button>
+                <button type="button" onClick={() => setIsLogin((value) => !value)} className="mt-5 text-sm font-bold text-violet-600 hover:text-violet-800">
+                  {isLogin ? "Belum punya akun? Daftar" : "Sudah punya akun? Masuk"}
+                </button>
+
+                <div className="mt-8 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-800">
+                  <Gamepad2 className="shrink-0" size={22} />
+                  <p className="text-xs font-semibold leading-5">Gunakan profil keluarga untuk pengalaman paling lengkap selama autentikasi cloud belum aktif.</p>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
-      </motion.div>
-    </div>
+        </section>
+      </div>
+    </main>
   );
 }
