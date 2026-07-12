@@ -1,8 +1,22 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f0f4ff; /* soft lavender white */
-  --foreground: #1e293b; /* slate-800 for readability */
+  --background: #f6f5ff;
+  --foreground: #19143a;
+  --surface: rgba(255, 255, 255, 0.94);
+  --surface-muted: rgba(255, 255, 255, 0.76);
+  --purple-950: #130b3b;
+  --purple-900: #21105f;
+  --purple-800: #32158a;
+  --purple-700: #5527ca;
+  --purple-600: #7442e8;
+  --purple-500: #8b5cf6;
+  --purple-100: #ede9fe;
+  --yellow-400: #facc15;
+  --pink-400: #fb7185;
+  --green-500: #22c55e;
+  --shadow-soft: 0 18px 50px rgba(55, 30, 130, 0.12);
+  --shadow-card: 0 12px 28px rgba(55, 30, 130, 0.1);
 }
 
 @theme inline {
@@ -12,114 +26,206 @@
   --font-mono: var(--font-geist-mono);
 }
 
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  overflow-x: hidden;
-  min-height: 100vh;
+* {
+  box-sizing: border-box;
 }
 
-/* Glassmorphism Utilities – Kids Light Theme */
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 5% 5%, rgba(139, 92, 246, 0.16), transparent 26rem),
+    radial-gradient(circle at 92% 18%, rgba(56, 189, 248, 0.14), transparent 28rem),
+    linear-gradient(180deg, #f8f7ff 0%, #f2f7ff 48%, #fff8fd 100%);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(250, 204, 21, 0.9);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: rgba(139, 92, 246, 0.24);
+  color: #21105f;
+}
+
 @layer utilities {
   .glass {
-    @apply bg-white/60 backdrop-blur-xl border border-white/40 shadow-xl;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.82);
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(20px);
   }
+
   .glass-dark {
-    @apply bg-white/40 backdrop-blur-2xl border border-white/30 shadow-2xl;
+    background: rgba(32, 14, 91, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 24px 80px rgba(16, 8, 55, 0.28);
+    backdrop-filter: blur(24px);
   }
+
   .glass-panel {
-    @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_8px_32px_rgba(0,0,0,0.08)];
+    background: var(--surface);
+    border: 1px solid rgba(108, 83, 190, 0.14);
+    box-shadow: var(--shadow-card);
+    backdrop-filter: blur(18px);
+  }
+
+  .app-card {
+    background: var(--surface);
+    border: 1px solid rgba(98, 77, 177, 0.14);
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow-card);
+  }
+
+  .kid-button {
+    min-height: 46px;
+    border-radius: 1rem;
+    font-weight: 800;
+    transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+  }
+
+  .kid-button:hover {
+    transform: translateY(-2px);
+    filter: saturate(1.06);
+  }
+
+  .kid-button:active {
+    transform: translateY(1px) scale(0.98);
+  }
+
+  .purple-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .text-balance {
+    text-wrap: balance;
   }
 }
 
-/* Kids Rainbow Aurora Animation */
 @keyframes aurora {
-  0% { background-position: 0% 50%; }
-  25% { background-position: 50% 0%; }
+  0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
-  75% { background-position: 50% 100%; }
-  100% { background-position: 0% 50%; }
 }
 
-@keyframes float-bubble {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-30px) scale(1.05); }
-}
-
-@keyframes float-bubble-reverse {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(20px) scale(0.95); }
+@keyframes float-soft {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -10px, 0) rotate(2deg); }
 }
 
 @keyframes twinkle {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.8; }
+  0%, 100% { opacity: 0.3; transform: scale(0.9); }
+  50% { opacity: 0.9; transform: scale(1.08); }
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.35); }
+  70% { box-shadow: 0 0 0 16px rgba(139, 92, 246, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
 }
 
 .aurora-bg {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -1;
-  background: linear-gradient(135deg, 
-    #e0f2fe 0%,   /* sky-100 */
-    #fce7f3 20%,  /* pink-100 */
-    #fef3c7 40%,  /* amber-100 */
-    #d1fae5 60%,  /* emerald-100 */
-    #ede9fe 80%,  /* violet-100 */
-    #e0f2fe 100%  /* sky-100 */
-  );
-  background-size: 400% 400%;
-  animation: aurora 20s ease-in-out infinite;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(139, 92, 246, 0.13), transparent 25rem),
+    radial-gradient(circle at 82% 24%, rgba(56, 189, 248, 0.13), transparent 28rem),
+    radial-gradient(circle at 70% 80%, rgba(251, 113, 133, 0.12), transparent 24rem);
+  background-size: 140% 140%;
+  animation: aurora 18s ease-in-out infinite;
 }
 
-/* Floating decorative bubbles */
 .aurora-bg::before,
 .aurora-bg::after {
-  content: '';
+  content: "";
   position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
+  border-radius: 999px;
+  filter: blur(2px);
 }
 
 .aurora-bg::before {
   top: 10%;
-  left: 8%;
-  width: 280px;
-  height: 280px;
-  background: radial-gradient(circle, rgba(251, 191, 36, 0.25), transparent 70%);
-  animation: float-bubble 8s ease-in-out infinite;
+  left: 5%;
+  width: 160px;
+  height: 160px;
+  background: rgba(250, 204, 21, 0.1);
+  animation: float-soft 8s ease-in-out infinite;
 }
 
 .aurora-bg::after {
-  bottom: 15%;
-  right: 10%;
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.2), transparent 70%);
-  animation: float-bubble-reverse 10s ease-in-out infinite;
+  right: 6%;
+  bottom: 10%;
+  width: 220px;
+  height: 220px;
+  background: rgba(139, 92, 246, 0.1);
+  animation: float-soft 10s ease-in-out infinite reverse;
 }
 
-/* Extra decorative stars (via box-shadow on body::before) */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  pointer-events: none;
-  background-image: 
-    radial-gradient(2px 2px at 20% 15%, rgba(251, 191, 36, 0.5), transparent),
-    radial-gradient(2px 2px at 75% 25%, rgba(236, 72, 153, 0.4), transparent),
-    radial-gradient(3px 3px at 45% 70%, rgba(59, 130, 246, 0.3), transparent),
-    radial-gradient(2px 2px at 85% 65%, rgba(16, 185, 129, 0.4), transparent),
-    radial-gradient(2px 2px at 35% 45%, rgba(168, 85, 247, 0.3), transparent),
-    radial-gradient(3px 3px at 60% 10%, rgba(251, 146, 60, 0.4), transparent),
-    radial-gradient(2px 2px at 10% 80%, rgba(56, 189, 248, 0.3), transparent);
-  animation: twinkle 4s ease-in-out infinite;
+.animate-float-soft {
+  animation: float-soft 4s ease-in-out infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 2.8s ease-in-out infinite;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 1.8s ease-out infinite;
+}
+
+.arabic-font,
+.Arabic-Font {
+  font-family: "Noto Naskh Arabic", "Scheherazade New", serif;
+}
+
+@media (max-width: 640px) {
+  .app-card,
+  .glass-panel {
+    border-radius: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
