@@ -1,13 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Clock3, RotateCcw, Trophy, Volume2, X } from "lucide-react";
+import { Check, Clock3, RotateCcw, Volume2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
 import { Header } from "@/components/Header";
 import { hijaiyahData } from "@/data/hijaiyah";
 import { playAudio } from "@/lib/audioCache";
+import { createQuizProgressItemId, createQuizQuestion } from "@/lib/learning/quiz";
 import { useAppStore, type QuizHistory } from "@/lib/store";
 
 type HijaiyahItem = (typeof hijaiyahData)[number];
@@ -19,16 +20,11 @@ function celebrate() {
   confetti({ particleCount: 90, spread: 70, origin: { y: 0.68 }, colors: ["#facc15", "#22c55e", "#8b5cf6", "#38bdf8"] });
 }
 
-function createQuestion() {
-  const shuffled = [...hijaiyahData].sort(() => Math.random() - 0.5);
-  const options = shuffled.slice(0, 4);
-  return { options, target: options[Math.floor(Math.random() * options.length)] };
-}
-
 export default function KuisPage() {
   const router = useRouter();
   const { updateProgress, completeQuizSession } = useAppStore();
-  const [{ options, target }, setQuestion] = useState(createQuestion);
+  const sessionIdRef = useRef(`quiz-${Date.now()}`);
+  const [{ options, target }, setQuestion] = useState(() => createQuizQuestion(hijaiyahData));
   const [status, setStatus] = useState<QuizStatus>("playing");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
@@ -49,7 +45,7 @@ export default function KuisPage() {
   const nextQuestion = (correct: number, wrong: number) => {
     if (currentIndex < QUESTION_COUNT - 1) {
       setCurrentIndex((value) => value + 1);
-      setQuestion(createQuestion());
+      setQuestion(createQuizQuestion(hijaiyahData));
       setStatus("playing");
       return;
     }
@@ -66,7 +62,7 @@ export default function KuisPage() {
       const nextCorrect = correctCount + 1;
       setCorrectCount(nextCorrect);
       setStatus("correct");
-      updateProgress("kuis_hijaiyah", `question-${currentIndex}-${Date.now()}`, 15);
+      updateProgress("kuis_hijaiyah", createQuizProgressItemId(sessionIdRef.current, currentIndex), 15);
       playAudio("kuis_correct", "/audio/kuis/correct.mp3");
       celebrate();
       window.setTimeout(() => nextQuestion(nextCorrect, wrongCount), 1200);
@@ -80,7 +76,8 @@ export default function KuisPage() {
   };
 
   const resetQuiz = () => {
-    setQuestion(createQuestion());
+    sessionIdRef.current = `quiz-${Date.now()}`;
+    setQuestion(createQuizQuestion(hijaiyahData));
     setStatus("playing");
     setCurrentIndex(0);
     setCorrectCount(0);
