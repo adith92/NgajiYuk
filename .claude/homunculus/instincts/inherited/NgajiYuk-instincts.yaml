@@ -1,0 +1,645 @@
+# Instincts generated from https://github.com/adith92/NgajiYuk
+# Generated: 2026-07-12T19:08:05.627Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: NgajiYuk-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: chore, feat, refactor, fix, test
+
+## Evidence
+
+- 85 commits analyzed
+- Detected conventional commit pattern
+- Examples: feat(ui): add reusable status badge, fix(ui): use local speech recognition types
+
+---
+id: NgajiYuk-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Commit Length
+
+## Action
+
+Keep commit messages concise (~42 characters)
+
+## Evidence
+
+- Average commit message length: 42 chars
+- Based on 85 commits
+
+---
+id: NgajiYuk-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: NgajiYuk-import-alias
+trigger: "when importing modules"
+confidence: 0.85
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Import Alias
+
+## Action
+
+Use path aliases (@/, ~/) instead of relative imports
+
+## Evidence
+
+- Import analysis shows alias pattern
+- Example: import { x } from '@/lib/x'
+
+---
+id: NgajiYuk-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Export Style
+
+## Action
+
+Prefer mixed exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: mixed
+
+---
+id: NgajiYuk-arch-type-based
+trigger: "when adding new code"
+confidence: 0.8
+domain: architecture
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Arch Type Based
+
+## Action
+
+Place code in the appropriate type folder (components/, services/, utils/, etc.)
+
+## Evidence
+
+- Type-based module organization detected
+- Folders: app, components, config, hooks, lib
+
+---
+id: NgajiYuk-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: NgajiYuk-test-naming
+trigger: "when creating a test file"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Test Naming
+
+## Action
+
+Name test files using the pattern: *.test.ts
+
+## Evidence
+
+- File pattern: *.test.ts
+- Consistent across test files
+
+---
+id: NgajiYuk-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~15x per month
+- Files: src/components/ui/*, src/components/*, src/app/*
+
+---
+id: NgajiYuk-workflow-feature-page-development
+trigger: "when doing feature page development"
+confidence: 0.8
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Workflow Feature Page Development
+
+## Action
+
+Follow the feature-page-development workflow:
+1. Create or update a page component in 'src/app/{feature}/page.tsx'
+2. Implement UI and logic for the feature
+3. Optionally, update related components or hooks
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~6x per month
+- Files: src/app/dashboard/page.tsx, src/app/progress/page.tsx, src/app/hijaiyah/page.tsx
+
+---
+id: NgajiYuk-workflow-ui-component-addition-or-redesign
+trigger: "when doing ui component addition or redesign"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Workflow Ui Component Addition Or Redesign
+
+## Action
+
+Follow the ui-component-addition-or-redesign workflow:
+1. Create or update a component in 'src/components/' or 'src/components/ui/'
+2. Implement or refine the component logic and styles
+3. Optionally, update global styles if needed
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: src/components/ui/StatusBadge.tsx, src/components/MenuCard.tsx, src/components/Header.tsx
+
+---
+id: NgajiYuk-workflow-refactor-helper-or-hook-and-consume
+trigger: "when doing refactor helper or hook and consume"
+confidence: 0.7
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Workflow Refactor Helper Or Hook And Consume
+
+## Action
+
+Follow the refactor-helper-or-hook-and-consume workflow:
+1. Refactor or create a helper/hook in 'src/lib/' or 'src/hooks/'
+2. Update relevant page(s) in 'src/app/{feature}/page.tsx' to use the new helper/hook
+3. Test the integration
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~4x per month
+- Files: src/lib/learning/progress.ts, src/lib/learning/quiz.ts, src/hooks/useRequireUser.ts
+
+---
+id: NgajiYuk-workflow-ci-pipeline-update
+trigger: "when doing ci pipeline update"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Workflow Ci Pipeline Update
+
+## Action
+
+Follow the ci-pipeline-update workflow:
+1. Create or update workflow files in '.github/workflows/'
+2. Add or update supporting scripts in 'scripts/'
+3. Update configuration files if needed
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: .github/workflows/ci.yml, .github/workflows/apply-ci-fixes.yml, .github/dependabot.yml
+
+---
+id: NgajiYuk-workflow-test-helper-or-feature
+trigger: "when doing test helper or feature"
+confidence: 0.7
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Workflow Test Helper Or Feature
+
+## Action
+
+Follow the test-helper-or-feature workflow:
+1. Create or update test files in 'tests/' or update 'package.json' for test scripts
+2. Write or update tests for helpers or features
+3. Run tests to verify correctness
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~4x per month
+- Files: tests/utils.test.mjs, tests/quiz.test.mjs, tests/progress.test.mjs
+
+---
+id: NgajiYuk-workflow-error-and-loading-boundary-setup
+trigger: "when doing error and loading boundary setup"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/adith92/NgajiYuk
+---
+
+# NgajiYuk Workflow Error And Loading Boundary Setup
+
+## Action
+
+Follow the error-and-loading-boundary-setup workflow:
+1. Create or update error, loading, and not-found components in 'src/app/'
+2. Wire up boundaries in layout or root files
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: src/app/loading.tsx, src/app/error.tsx, src/app/not-found.tsx
+
+---
+id: ngajiyuk-instinct-file-naming-camelcase
+trigger: "When creating a new file in src/"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct File Naming Camelcase
+
+## Action
+
+Name the file using camelCase (e.g., useSpeechPractice.ts).
+
+## Evidence
+
+- Pattern in files: src/hooks/useRequireUser.ts, src/lib/learning/progress.ts
+
+---
+id: ngajiyuk-instinct-function-naming-camelcase
+trigger: "When defining a function."
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Function Naming Camelcase
+
+## Action
+
+Name the function using camelCase.
+
+## Evidence
+
+- Pattern in code: useSpeechPractice, centralizeProfilesNavigation
+
+---
+id: ngajiyuk-instinct-class-naming-pascalcase
+trigger: "When defining a class."
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Class Naming Pascalcase
+
+## Action
+
+Name the class using PascalCase.
+
+## Evidence
+
+- Pattern in code: StatusBadge, MenuCard
+
+---
+id: ngajiyuk-instinct-constant-naming-screaming-snake-case
+trigger: "When defining a constant."
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Constant Naming Screaming Snake Case
+
+## Action
+
+Name the constant using SCREAMING_SNAKE_CASE.
+
+## Evidence
+
+- Pattern in code: inferred from naming conventions
+
+---
+id: ngajiyuk-instinct-import-alias
+trigger: "When importing modules."
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Import Alias
+
+## Action
+
+Use import aliases for module paths.
+
+## Evidence
+
+- Pattern in code: importStyle is alias
+
+---
+id: ngajiyuk-instinct-export-mixed
+trigger: "When exporting modules."
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Export Mixed
+
+## Action
+
+Use both named and default exports as appropriate.
+
+## Evidence
+
+- Pattern in code: exportStyle is mixed
+
+---
+id: ngajiyuk-instinct-test-file-pattern
+trigger: "When adding a new test file."
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Test File Pattern
+
+## Action
+
+Name the test file with the pattern *.test.ts and place it in the tests/ directory.
+
+## Evidence
+
+- Pattern in files: tests/utils.test.mjs, tests/quiz.test.mjs, tests/progress.test.mjs
+
+---
+id: ngajiyuk-instinct-unit-test-helper-or-feature
+trigger: "When a new helper or feature is added or refactored."
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Unit Test Helper Or Feature
+
+## Action
+
+Write or update a unit test for the helper or feature in tests/.
+
+## Evidence
+
+- Workflow: test-helper-or-feature
+- Pattern in files: tests/quiz.test.mjs, tests/progress.test.mjs
+
+---
+id: ngajiyuk-instinct-git-commit-conventional
+trigger: "When making a commit."
+confidence: 0.95
+domain: git
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Git Commit Conventional
+
+## Action
+
+Format the commit message using the conventional commit style: <type>(<scope>): <description>.
+
+## Evidence
+
+- Pattern in commits: feat(ui): add reusable status badge, fix(ui): use local speech recognition types
+
+---
+id: ngajiyuk-instinct-git-commit-prefixes
+trigger: "When choosing a commit type."
+confidence: 0.95
+domain: git
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Git Commit Prefixes
+
+## Action
+
+Use one of the following prefixes: chore, feat, refactor, fix, test, docs, ci.
+
+## Evidence
+
+- Pattern in commits: feat, fix, refactor, chore, test, docs, ci
+
+---
+id: ngajiyuk-instinct-feature-page-development
+trigger: "When adding or redesigning a feature page (e.g., dashboard, quiz, learning flow)."
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Feature Page Development
+
+## Action
+
+Create or update a page component in src/app/{feature}/page.tsx.
+
+## Evidence
+
+- Workflow: feature-page-development
+- Pattern in files: src/app/dashboard/page.tsx, src/app/kuis/page.tsx
+
+---
+id: ngajiyuk-instinct-ui-component-addition-or-redesign
+trigger: "When introducing or updating a UI component."
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Ui Component Addition Or Redesign
+
+## Action
+
+Create or update a component in src/components/ or src/components/ui/.
+
+## Evidence
+
+- Workflow: ui-component-addition-or-redesign
+- Pattern in files: src/components/ui/StatusBadge.tsx, src/components/MenuCard.tsx
+
+---
+id: ngajiyuk-instinct-refactor-helper-or-hook
+trigger: "When centralizing logic for reuse."
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Refactor Helper Or Hook
+
+## Action
+
+Refactor or create a helper/hook in src/lib/ or src/hooks/ and update relevant page(s) to use it.
+
+## Evidence
+
+- Workflow: refactor-helper-or-hook-and-consume
+- Pattern in files: src/hooks/useRequireUser.ts, src/lib/learning/progress.ts
+
+---
+id: ngajiyuk-instinct-ci-pipeline-update
+trigger: "When improving or adding CI/CD checks."
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Ci Pipeline Update
+
+## Action
+
+Create or update workflow files in .github/workflows/ and supporting scripts in scripts/.
+
+## Evidence
+
+- Workflow: ci-pipeline-update
+- Pattern in files: .github/workflows/ci.yml, scripts/apply-ci-fixes.mjs
+
+---
+id: ngajiyuk-instinct-test-helper-or-feature
+trigger: "When ensuring correctness of helpers or new features."
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Test Helper Or Feature
+
+## Action
+
+Create or update test files in tests/ and run tests to verify correctness.
+
+## Evidence
+
+- Workflow: test-helper-or-feature
+- Pattern in files: tests/utils.test.mjs, package.json
+
+---
+id: ngajiyuk-instinct-error-and-loading-boundary-setup
+trigger: "When improving error handling and loading feedback."
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: adith92/NgajiYuk
+---
+
+# Ngajiyuk Instinct Error And Loading Boundary Setup
+
+## Action
+
+Create or update error, loading, and not-found components in src/app/ and wire up boundaries.
+
+## Evidence
+
+- Workflow: error-and-loading-boundary-setup
+- Pattern in files: src/app/error.tsx, src/app/loading.tsx
+
