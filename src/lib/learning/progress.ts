@@ -1,4 +1,4 @@
-import type { Progress, QuizHistory } from "@/lib/store";
+import type { Progress, QuizHistory } from "../store";
 
 export type UserProgressMap = Record<string, Progress>;
 
