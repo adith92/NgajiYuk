@@ -12,8 +12,11 @@ export function createClient(): SupabaseClient | null {
   if (browserClient) return browserClient;
 
   const environment = getPublicEnvironment();
-  if (!environment.supabaseUrl || !environment.supabaseAnonKey) return null;
+  if (!environment.supabaseUrl || !environment.supabasePublishableKey) return null;
 
-  browserClient = createBrowserClient(environment.supabaseUrl, environment.supabaseAnonKey);
+  browserClient = createBrowserClient(
+    environment.supabaseUrl,
+    environment.supabasePublishableKey,
+  );
   return browserClient;
 }
