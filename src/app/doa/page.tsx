@@ -11,6 +11,28 @@ import { doaData } from "@/data/doa";
 import { playAudio } from "@/lib/audioCache";
 import { normalizeArabic, stringSimilarity } from "@/lib/utils";
 
+interface SpeechResultEvent {
+  results: {
+    [index: number]: {
+      [index: number]: { transcript: string };
+    };
+  };
+}
+
+interface SpeechRecognitionController {
+  lang: string;
+  interimResults: boolean;
+  maxAlternatives: number;
+  onstart: (() => void) | null;
+  onresult: ((event: SpeechResultEvent) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionController;
+
 function celebrate() {
   confetti({ particleCount: 90, spread: 68, origin: { y: 0.7 }, colors: ["#fb7185", "#facc15", "#8b5cf6", "#38bdf8"] });
 }
@@ -33,10 +55,11 @@ export default function DoaPage() {
   };
 
   const startRecording = () => {
-    const SpeechRecognition = (window as typeof window & {
-      SpeechRecognition?: new () => SpeechRecognition;
-      webkitSpeechRecognition?: new () => SpeechRecognition;
-    }).SpeechRecognition || (window as typeof window & { webkitSpeechRecognition?: new () => SpeechRecognition }).webkitSpeechRecognition;
+    const speechWindow = window as typeof window & {
+      SpeechRecognition?: SpeechRecognitionConstructor;
+      webkitSpeechRecognition?: SpeechRecognitionConstructor;
+    };
+    const SpeechRecognition = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       setMessage({ text: "Browser ini belum mendukung latihan mikrofon. Coba gunakan Chrome terbaru.", type: "error" });
@@ -51,7 +74,7 @@ export default function DoaPage() {
       setRecordingId(activeDoa.id);
       setMessage({ text: "Mendengarkan... baca perlahan ya 🎙️", type: "info" });
     };
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       const score = Math.round(stringSimilarity(normalizeArabic(activeDoa.arabic), normalizeArabic(transcript)) * 100);
       if (score >= 70) {
