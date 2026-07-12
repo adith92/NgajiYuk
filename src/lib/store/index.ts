@@ -1,13 +1,12 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-import { UserSlice, createUserSlice } from './userSlice';
-import { ProgressSlice, createProgressSlice } from './progressSlice';
-import { GameZoneSlice, createGameZoneSlice } from './gameZoneSlice';
-import { QuizSlice, createQuizSlice } from './quizSlice';
+import { type UserSlice, createUserSlice } from "./userSlice";
+import { type ProgressSlice, createProgressSlice } from "./progressSlice";
+import { type GameZoneSlice, createGameZoneSlice } from "./gameZoneSlice";
+import { type QuizSlice, createQuizSlice } from "./quizSlice";
 
-// Re-export types
-export * from './types';
+export * from "./types";
 
 export type AppState = UserSlice & ProgressSlice & GameZoneSlice & QuizSlice;
 
@@ -20,7 +19,17 @@ export const useAppStore = create<AppState>()(
       ...createQuizSlice(set, get, api),
     }),
     {
-      name: 'ngajiyuk-storage',
-    }
-  )
+      name: "ngajiyuk-storage",
+      version: 2,
+      partialize: (state) => ({
+        users: state.users,
+        currentUserUid: state.currentUserUid,
+        landingTheme: state.landingTheme,
+        progress: state.progress,
+        rewardUnlocks: state.rewardUnlocks,
+        quizHistory: state.quizHistory,
+      }),
+      migrate: (persistedState) => persistedState as AppState,
+    },
+  ),
 );

@@ -1,9 +1,22 @@
-import { createBrowserClient } from '@supabase/ssr'
+import { createBrowserClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { getPublicEnvironment } from "@/lib/env";
 
-export function createClient() {
-  // We use non-null assertion as Next.js will warn if they are missing at build time
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+let browserClient: SupabaseClient | null = null;
+
+export function isSupabaseConfigured(): boolean {
+  return getPublicEnvironment().isSupabaseConfigured;
+}
+
+export function createClient(): SupabaseClient | null {
+  if (browserClient) return browserClient;
+
+  const environment = getPublicEnvironment();
+  if (!environment.supabaseUrl || !environment.supabasePublishableKey) return null;
+
+  browserClient = createBrowserClient(
+    environment.supabaseUrl,
+    environment.supabasePublishableKey,
+  );
+  return browserClient;
 }
