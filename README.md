@@ -2,13 +2,13 @@
 
 # 📖✨ NgajiYuk
 
-### Belajar Hijaiyah, doa harian, bacaan sholat, dan kuis Islami dengan pengalaman yang ceria untuk anak 🌙⭐
+### Belajar Hijaiyah, doa harian, bacaan sholat, dan kuis Islami dengan pengalaman ceria untuk anak dan keluarga 🌙⭐
 
 ![Project Status](https://img.shields.io/badge/status-active%20development-f59e0b?style=for-the-badge)
 ![Next.js](https://img.shields.io/badge/Next.js-16.2.9-000000?style=for-the-badge&logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19.2.4-61DAFB?style=for-the-badge&logo=react&logoColor=111827)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![CI](https://img.shields.io/badge/CI-lint%20%7C%20typecheck%20%7C%20test%20%7C%20build-22c55e?style=for-the-badge)
 
 </div>
 
@@ -16,95 +16,97 @@
 
 ## 🌟 Tentang NgajiYuk
 
-**NgajiYuk** adalah aplikasi web edukasi Islam untuk anak dan keluarga. Aplikasi ini menggabungkan materi belajar dasar, audio interaktif, pencatatan progres, kuis, dan sistem hadiah waktu bermain dalam antarmuka yang cerah serta ramah anak. 🎨🕌
+**NgajiYuk** adalah aplikasi web edukasi Islam untuk anak dan keluarga. Aplikasi menggabungkan materi belajar dasar, audio interaktif, pencatatan progres, kuis, serta hadiah waktu bermain dalam antarmuka yang cerah dan ramah anak. 🎨🕌
 
-Aplikasi aktif saat ini berjalan dengan **Next.js App Router** dan menyimpan profil, progres, riwayat kuis, serta status Game Zone secara lokal di browser menggunakan Zustand Persist.
+Aplikasi aktif menggunakan **Next.js App Router**, **TypeScript**, **Tailwind CSS**, **Zustand Persist**, **IndexedDB**, dan integrasi opsional **Supabase Auth**.
 
-> 🚧 **Status produk:** prototype fungsional dalam pengembangan aktif. Beberapa bagian masih berupa simulasi lokal dan belum menggunakan autentikasi atau database cloud secara penuh.
+> 🚧 **Status produk:** prototype fungsional dalam pengembangan aktif. Profil, progres, riwayat kuis, dan timer Game Zone masih disimpan lokal. Sinkronisasi cloud dan validasi server belum diterapkan.
 
 ---
 
-## 📊 Status Aplikasi
+## 📊 Status Implementasi
 
-**Terakhir disinkronkan dengan codebase aktif:** 12 Juli 2026 🗓️
+**Terakhir disinkronkan dengan implementation stack:** 12 Juli 2026 🗓️
 
 | Area | Status | Keterangan |
 |---|---|---|
-| 👨‍👩‍👧‍👦 Profil keluarga lokal | ✅ Aktif | Tersedia empat profil cepat: Abeel, Emily, Emier, dan Bunda Uma |
-| 🔐 Login email dan password | 🟡 Simulasi | Form tersedia, tetapi belum melakukan autentikasi ke server |
-| 🔤 Belajar Hijaiyah | 🟡 Aktif, perlu perbaikan audio | Materi dan progres aktif; jalur audio halaman Hijaiyah masih perlu diselaraskan |
+| 🎨 UI/UX baru | ✅ Aktif pada branch implementasi | Landing kosmik, dashboard anak, sidebar, mobile navigation, dan kartu modul baru |
+| 👨‍👩‍👧‍👦 Profil keluarga lokal | ✅ Aktif | Abeel, Emily, Emier, dan Bunda Uma memiliki progres terpisah |
+| 🔐 Login email dan password | 🟡 Siap saat Supabase dikonfigurasi | Menggunakan Supabase Auth; tombol dinonaktifkan saat environment belum tersedia |
+| 🔤 Belajar Hijaiyah | ✅ Aktif | Carousel belajar, grid huruf, audio, poin, dan progres |
+| 🔊 Audio Hijaiyah | ✅ Jalur diselaraskan | Menggunakan aset `/audio/kuis/hijaiyah_<id>.mp3` |
 | 🤲 Doa harian | ✅ Aktif | Arab, latin, arti, audio, progres, dan latihan pengucapan |
-| 🎙️ Latihan pengucapan | 🟡 Eksperimental | Menggunakan Web Speech API dan kemiripan teks, bukan penilaian tajwid atau makhraj |
+| 🎙️ Latihan pengucapan | 🟡 Eksperimental | Web Speech API dan kemiripan teks, bukan penilaian tajwid atau makhraj |
 | 🕌 Bacaan sholat | ✅ Aktif | Bacaan, latin, arti, audio, urutan, dan progres |
-| 🧠 Kuis Hijaiyah | ✅ Aktif | Sepuluh soal per sesi dengan skor dan riwayat lokal |
-| 🎮 Game Zone | ✅ Aktif secara lokal | Terbuka saat skor kuis minimal 80% dan memakai timer lokal |
-| 💾 Cache audio | ✅ Aktif | Audio disimpan di IndexedDB untuk mengurangi pengunduhan berulang |
-| ☁️ Supabase | 🟡 Disiapkan | Client dan environment variable tersedia, tetapi belum terhubung ke flow aplikasi |
-| 🌐 Bahasa Indonesia, Jepang, Betawi | 🟡 Parsial | Resource terjemahan tersedia, tetapi sebagian besar UI aktif masih berbahasa Indonesia |
-| 📚 Hafalan surah | 🔴 Belum aktif | Data dan implementasi lama masih terdapat pada aplikasi legacy |
-| 👤 Halaman profil dan tema | 🔴 Belum aktif | Model state tersedia, tetapi route aktif belum tersedia |
-| 🧪 Automated testing | 🔴 Belum aktif pada app Next.js | Test lama masih berada di folder `_old_vite_app` |
-| 📱 PWA penuh | 🔴 Belum tersedia | Cache audio tersedia, tetapi service worker dan installable PWA belum diterapkan |
+| 🧠 Kuis Hijaiyah | ✅ Aktif | Sepuluh soal, audio, skor, reward, dan ID progres per sesi |
+| 🎮 Game Zone | ✅ Aktif secara lokal | Terbuka setelah skor minimal 80%, dengan timer lokal |
+| 📈 Progress & Poin | ✅ Aktif | Ringkasan poin, progres modul, rata-rata kuis, dan riwayat kuis |
+| 💾 Cache audio | ✅ Aktif | IndexedDB dengan batas 64 item dan eviksi LRU |
+| 🧱 Struktur kode | ✅ Ditingkatkan | Config, hooks, progress helper, dan quiz helper dipisahkan dari halaman |
+| 🛡️ Production safeguards | ✅ Dasar tersedia | Security headers, metadata, error boundary, loading, 404, dan persistence versioning |
+| 🧪 Automated testing | ✅ Aktif | Native Node test runner dengan 12 unit test |
+| 🚦 Continuous Integration | ✅ Aktif | GitHub Actions menjalankan lint, typecheck, unit test, dan production build |
+| 🌐 Bahasa Indonesia, Jepang, Betawi | 🟡 Parsial | Resource tersedia, tetapi UI aktif masih didominasi bahasa Indonesia |
+| 📚 Hafalan surah | 🔴 Belum aktif | Data lama masih tersedia pada aplikasi legacy |
+| 📱 PWA penuh | 🔴 Belum tersedia | Belum memiliki service worker dan installable manifest lengkap |
 
-### Legenda status 🚦
+### Legenda 🚦
 
-- ✅ **Aktif:** tersedia pada aplikasi Next.js yang berjalan sekarang.
-- 🟡 **Parsial/eksperimental:** tersedia, tetapi belum lengkap atau memiliki batasan penting.
-- 🔴 **Belum aktif:** belum menjadi bagian dari pengalaman aplikasi aktif.
+- ✅ **Aktif:** tersedia pada implementation stack saat ini.
+- 🟡 **Parsial/eksperimental:** tersedia dengan batasan penting.
+- 🔴 **Belum aktif:** belum menjadi bagian pengalaman aplikasi aktif.
 
 ---
 
-## 🎯 Fitur Utama
+## 🎯 Pengalaman Utama
 
-### 👨‍👩‍👧‍👦 Profil belajar keluarga
+### 🌌 Landing dan profil keluarga
 
-- Memilih profil anak atau pembimbing dari halaman awal.
-- Progres, poin, riwayat kuis, dan hadiah Game Zone dipisahkan berdasarkan profil.
-- Data saat ini tersimpan pada browser/perangkat yang digunakan.
+- Tampilan ungu kosmik dengan informasi fitur utama.
+- Empat profil keluarga untuk masuk cepat.
+- Login email menggunakan Supabase Auth bila environment tersedia.
+- Pesan yang jelas ketika Supabase belum dikonfigurasi.
 
-### 🔤 Belajar huruf Hijaiyah
+### 🏠 Dashboard anak
 
-- Daftar huruf dari Alif sampai Ya.
-- Tampilan kartu interaktif dan animasi ramah anak.
-- Poin progres untuk setiap huruf yang dipelajari.
-- Dukungan audio lokal sedang dalam tahap penyelarasan jalur file.
+- Sidebar desktop dan bottom navigation mobile.
+- Enam kartu aktivitas: Hijaiyah, Doa, Sholat, Kuis, Game Zone, dan Progress.
+- Ringkasan poin, kuis terakhir, jumlah doa, dan sesi kuis.
+- Progress bar per modul.
+
+### 🔤 Belajar Hijaiyah
+
+- Tampilan satu huruf dengan navigasi maju dan mundur.
+- Grid semua huruf untuk perpindahan cepat.
+- Audio lokal dan penanda selesai.
+- Poin serta progress per profil.
 
 ### 🤲 Doa harian
 
-- Teks Arab, transliterasi latin, dan terjemahan Indonesia.
-- Audio lokal untuk setiap doa.
-- Tombol penanda hafal dan pemberian poin.
-- Latihan mengucapkan doa melalui Web Speech API pada browser yang mendukung.
+- Teks Arab, latin, dan arti.
+- Audio lokal.
+- Latihan mikrofon dengan tombol berhenti yang benar-benar menghentikan recognition.
+- Feedback menyebut **kemiripan transkrip**, bukan memastikan tajwid benar.
 
 ### 🕌 Bacaan sholat
 
-- Urutan bacaan mulai dari niat hingga salam.
-- Teks Arab, latin, arti, audio, dan pencatatan progres.
-- Modul aktif saat ini berfokus pada **bacaan sholat**, belum menjadi panduan visual lengkap gerakan sholat.
+- Navigasi langkah demi langkah.
+- Daftar bacaan untuk perpindahan cepat.
+- Arab, latin, arti, audio, dan progres.
 
-### 🧠 Kuis Hijaiyah
+### 🧠 Kuis dan reward
 
-- Sepuluh pertanyaan per sesi.
-- Empat pilihan jawaban pada setiap soal.
-- Audio petunjuk huruf.
-- Rekap jawaban benar, salah, persentase skor, dan hadiah waktu bermain.
-
-### 🎮 Game Zone
-
-| Skor kuis | Hadiah bermain |
+| Skor | Reward Game Zone |
 |---:|---:|
 | 80–89% | 15 menit |
 | 90–99% | 30 menit |
 | 100% | 45 menit |
 
-Game Zone saat ini berisi permainan mengetuk bintang dengan timer yang disimpan secara lokal. ⭐🪐
+Kuis membuat soal acak dengan empat opsi unik. Setiap sesi memiliki ID progres sendiri agar poin tidak bertabrakan dengan sesi sebelumnya. 🏆
 
-### 🔊 Audio lokal dan cache
+### 🎮 Game Zone
 
-- Audio dimuat dari folder `public/audio`.
-- File yang berhasil dimuat disimpan ke IndexedDB.
-- Cache dibatasi hingga 50 item.
-- Script Python tersedia untuk membuat ulang sebagian aset audio menggunakan `edge-tts`.
+Game Zone saat ini menyediakan permainan **Kejar Bintang**. Setiap sepuluh bintang memicu selebrasi. Puzzle Hijaiyah dan Memory Match ditampilkan sebagai fitur mendatang. ⭐🪐
 
 ---
 
@@ -112,15 +114,16 @@ Game Zone saat ini berisi permainan mengetuk bintang dengan timer yang disimpan 
 
 | Route | Fungsi |
 |---|---|
-| `/` | Pemilihan profil dan simulasi login email |
-| `/dashboard` | Menu utama pembelajaran |
-| `/hijaiyah` | Materi huruf Hijaiyah |
+| `/` | Landing, pemilihan profil, dan Supabase Auth |
+| `/dashboard` | Menu utama dan ringkasan belajar |
+| `/hijaiyah` | Belajar huruf Hijaiyah |
 | `/doa` | Doa harian dan latihan pengucapan |
 | `/sholat` | Bacaan sholat |
 | `/kuis` | Kuis Hijaiyah |
 | `/gamezone` | Game hadiah setelah lulus kuis |
+| `/progress` | Poin, progress modul, dan riwayat kuis |
 
-Route seperti `/hafalan` dan `/profile` belum tersedia pada aplikasi Next.js aktif. 🧭
+Route `/hafalan` dan `/profile` belum tersedia pada aplikasi aktif. 🧭
 
 ---
 
@@ -128,16 +131,17 @@ Route seperti `/hafalan` dan `/profile` belum tersedia pada aplikasi Next.js akt
 
 | Teknologi | Kegunaan |
 |---|---|
-| [Next.js](https://nextjs.org/) 16 | Framework dan App Router |
-| [React](https://react.dev/) 19 | Antarmuka pengguna |
-| [TypeScript](https://www.typescriptlang.org/) | Type safety |
-| [Tailwind CSS](https://tailwindcss.com/) 4 | Styling |
-| [Framer Motion](https://www.framer.com/motion/) | Animasi dan transisi |
-| [Zustand](https://zustand-demo.pmnd.rs/) | State management dan local persistence |
-| [IndexedDB](https://developer.mozilla.org/docs/Web/API/IndexedDB_API) | Cache audio lokal |
-| [Supabase](https://supabase.com/) | Fondasi autentikasi/database yang belum diintegrasikan |
-| [Web Speech API](https://developer.mozilla.org/docs/Web/API/Web_Speech_API) | Speech-to-text eksperimental |
-| [Canvas Confetti](https://www.npmjs.com/package/canvas-confetti) | Efek penghargaan visual 🎉 |
+| Next.js 16 | Framework dan App Router |
+| React 19 | Antarmuka pengguna |
+| TypeScript | Type safety |
+| Tailwind CSS 4 | Design system dan responsive UI |
+| Framer Motion | Animasi dan transisi |
+| Zustand | State management dan local persistence |
+| IndexedDB | Cache audio lokal dengan LRU |
+| Supabase | Autentikasi email opsional |
+| Web Speech API | Speech-to-text eksperimental |
+| Node Test Runner | Unit testing tanpa dependency test tambahan |
+| GitHub Actions | Quality gates pada Pull Request |
 
 ---
 
@@ -145,30 +149,35 @@ Route seperti `/hafalan` dan `/profile` belum tersedia pada aplikasi Next.js akt
 
 ```text
 NgajiYuk/
+├── .github/
+│   ├── workflows/ci.yml          # Lint, typecheck, test, dan build
+│   ├── dependabot.yml            # Pemeriksaan dependency berkala
+│   └── pull_request_template.md  # Checklist review AGY
 ├── public/
-│   ├── audio/                 # Audio doa, sholat, dan kuis
-│   └── images/                # Aset gambar aplikasi
-├── scripts/
-│   ├── generate-doa.py        # Generator audio doa
-│   ├── generate-kuis.py       # Generator audio kuis
-│   └── generate-sholat.py     # Generator audio sholat
+│   ├── audio/                    # Audio doa, sholat, dan kuis
+│   └── images/                   # Aset gambar aplikasi
+├── scripts/                      # Generator audio edge-tts
 ├── src/
-│   ├── app/                   # Route Next.js App Router
-│   ├── components/            # Komponen UI reusable
-│   ├── data/                  # Data Hijaiyah, doa, sholat, dan surah
+│   ├── app/                      # Route Next.js dan error/loading boundary
+│   ├── components/               # Komponen UI reusable
+│   ├── config/                   # Profil, navigasi, dan konfigurasi modul
+│   ├── data/                     # Hijaiyah, doa, sholat, dan surah
+│   ├── hooks/                    # Auth guard dan speech practice
 │   ├── lib/
-│   │   ├── store/             # Zustand slices
-│   │   ├── supabase/          # Supabase browser client
-│   │   ├── audioCache.ts      # IndexedDB audio cache
-│   │   ├── i18n.ts            # Resource terjemahan
-│   │   └── utils.ts           # Normalisasi teks dan similarity
-│   └── types/                 # Model data TypeScript
-├── _old_vite_app/             # Arsip aplikasi Vite lama, bukan source aktif
+│   │   ├── learning/             # Quiz dan progress helper murni
+│   │   ├── store/                # Zustand slices
+│   │   ├── supabase/             # Supabase browser client
+│   │   ├── audioCache.ts         # IndexedDB LRU audio cache
+│   │   ├── env.ts                # Validasi environment publik
+│   │   └── utils.ts              # Normalisasi dan similarity
+│   └── types/                    # Model TypeScript
+├── tests/                        # Native Node unit tests
+├── _old_vite_app/                # Arsip legacy, tidak dilint atau dibuild
 ├── package.json
 └── README.md
 ```
 
-> 📌 Source of truth aplikasi aktif adalah folder **`src/`** pada root. Folder **`_old_vite_app/`** merupakan kode legacy dari sebelum migrasi ke Next.js.
+> 📌 Source of truth aplikasi adalah folder **`src/`** pada root. Folder **`_old_vite_app/`** hanya arsip sebelum migrasi Next.js.
 
 ---
 
@@ -176,187 +185,181 @@ NgajiYuk/
 
 ### Prasyarat
 
-- Node.js versi modern yang kompatibel dengan Next.js 16
+- Node.js **22**
 - npm
-- Browser modern, disarankan Google Chrome untuk fitur pengucapan 🎙️
+- Google Chrome terbaru untuk pengalaman Web Speech API terbaik 🎙️
 
 ### Instalasi
 
 ```bash
 git clone https://github.com/adith92/NgajiYuk.git
 cd NgajiYuk
-npm install
+npm ci
 ```
 
-### Menjalankan development server
+### Development
 
 ```bash
 npm run dev
 ```
 
-Buka [http://localhost:3000](http://localhost:3000) pada browser.
+Buka `http://localhost:3000`.
 
-### Build production
-
-```bash
-npm run build
-npm run start
-```
-
-### Lint
+### Quality gates
 
 ```bash
 npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+Atau jalankan semuanya sekaligus:
+
+```bash
+npm run check
 ```
 
 ---
 
-## 🔐 Environment Variables
+## 🔐 Supabase Auth
 
-Salin contoh environment variable:
+Salin environment example:
 
 ```bash
 cp .env.example .env.local
 ```
 
-Isi nilai berikut apabila Supabase mulai digunakan:
+Isi nilai berikut:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-> 🟡 Pada kondisi codebase saat ini, Supabase client sudah tersedia tetapi autentikasi, profil, progres, dan kuis masih menggunakan state lokal. Jangan menganggap form email sebagai autentikasi production.
+Saat kedua nilai tersedia, form email menjalankan:
+
+- `signInWithPassword` untuk masuk,
+- `signUp` untuk mendaftar,
+- pesan konfirmasi email ketika session belum dibuat.
+
+Profil keluarga tetap berjalan lokal tanpa Supabase. Progres cloud dan child profile di bawah akun orang tua belum tersedia.
 
 ---
 
-## 🎧 Membuat Ulang Audio
+## 🔊 Audio dan Cache
 
-Script generator audio menggunakan Python dan package `edge-tts`.
+- Audio dimuat dari `public/audio`.
+- Aset Hijaiyah aktif berada di `public/audio/kuis/hijaiyah_<id>.mp3`.
+- Audio yang berhasil dimuat disimpan di IndexedDB.
+- Cache menyimpan metadata waktu akses dan menghapus item paling lama digunakan saat melewati 64 item.
+- Hanya satu audio diputar pada satu waktu.
+- Object URL dibersihkan saat audio selesai, gagal, atau diganti.
 
-### Instal dependency Python
+Generator audio:
 
 ```bash
 pip install edge-tts
-```
-
-### Jalankan generator
-
-```bash
 python scripts/generate-doa.py
 python scripts/generate-kuis.py
 python scripts/generate-sholat.py
 ```
 
-Script akan melewati file yang sudah tersedia. Hapus file target terlebih dahulu apabila ingin membuat ulang audionya. 🎵
+---
+
+## 🧪 Testing & CI
+
+Unit test saat ini mencakup:
+
+- normalisasi teks Arab,
+- normalisasi teks Latin,
+- Levenshtein similarity,
+- generator opsi kuis,
+- validasi target kuis,
+- ID progres per sesi,
+- pembatasan persentase,
+- agregasi poin dan progress,
+- rata-rata serta riwayat kuis.
+
+Jalankan:
+
+```bash
+npm test
+```
+
+GitHub Actions menjalankan quality gates pada setiap Pull Request dan push ke `main`:
+
+1. `npm ci`
+2. `npm run lint`
+3. `npm run typecheck`
+4. `npm test`
+5. `npm run build`
+
+Dependency npm dan GitHub Actions diperiksa bulanan melalui Dependabot. 🤖🚦
 
 ---
 
 ## ⚠️ Batasan Penting
 
-### 🔐 Autentikasi masih lokal
+### 🎙️ Latihan pengucapan bukan pemeriksaan tajwid
 
-Login profil dan form email belum menggunakan server. Seluruh data aplikasi dapat berubah atau hilang apabila local storage browser dibersihkan.
+Fitur mikrofon membandingkan transkripsi browser dengan teks Arab. Fitur ini bukan penilai makhraj, panjang pendek, maupun hukum tajwid. Gunakan sebagai motivasi latihan bersama pembimbing. 🫶
 
-### 🎙️ Pemeriksaan pengucapan bukan pemeriksaan tajwid
+### 📚 Konten agama perlu review ahli
 
-Fitur pengucapan membandingkan hasil transkripsi suara dengan teks Arab menggunakan normalisasi karakter dan Levenshtein similarity. Fitur ini:
+Sebagian data masih memiliki `needsReview` atau komentar verifikasi. Sebelum rilis publik luas, teks Arab, transliterasi, terjemahan, sumber, dan audio perlu diperiksa bersama ustaz atau guru mengaji yang kompeten. ✅🕌
 
-- bukan penilai makhraj,
-- bukan penilai panjang pendek,
-- bukan pemeriksa hukum tajwid,
-- dapat memberikan hasil berbeda antar-browser dan perangkat.
+### 💾 Progres dan timer masih lokal
 
-Gunakan hasilnya sebagai motivasi latihan, bukan sebagai keputusan bahwa bacaan telah benar secara tajwid. 🫶
+Local storage dapat diedit atau dibersihkan pengguna. Timer Game Zone belum divalidasi server dan tidak boleh dianggap sebagai kontrol parental yang aman untuk production.
 
-### 📚 Konten agama memerlukan review ahli
+### 🔐 Supabase Auth belum berarti cloud progress
 
-Sebagian data memiliki penanda `needsReview` atau komentar verifikasi. Sebelum rilis publik yang lebih luas:
-
-- periksa teks Arab,
-- transliterasi,
-- terjemahan,
-- sumber hadis/ayat,
-- serta kecocokan audio,
-
-bersama ustaz, guru mengaji, atau reviewer yang kompeten. ✅🕌
-
-### 💾 Progress belum tersinkron
-
-Progres antar-browser atau antar-perangkat belum tersinkron karena masih disimpan secara lokal.
-
----
-
-## 🧪 Testing
-
-Aplikasi Next.js aktif belum memiliki test runner pada `package.json`. Test Vitest yang lama masih berada di `_old_vite_app/tests` dan belum menjadi bagian dari pipeline aplikasi aktif.
-
-Target testing berikutnya:
-
-- unit test Zustand slices,
-- validasi seluruh route dashboard,
-- pemeriksaan keberadaan file audio,
-- test aturan reward Game Zone,
-- test expiry timer,
-- test komponen kuis,
-- dan end-to-end test dengan Playwright. 🧪🤖
+Autentikasi email sudah disiapkan, tetapi profil anak, progres, kuis, dan Game Zone belum tersimpan di database Supabase.
 
 ---
 
 ## 🛣️ Roadmap
 
-### 🔥 P0: stabilisasi
+### ✅ Selesai pada implementation stack ini
 
-- [ ] Perbaiki jalur audio halaman Hijaiyah
-- [ ] Hentikan Web Speech Recognition secara nyata saat tombol berhenti ditekan
-- [ ] Ganti dynamic Tailwind class dengan variant map statis
-- [ ] Review seluruh konten agama dan audio
-- [ ] Tegaskan mode login sebagai demo atau integrasikan autentikasi sungguhan
+- [x] Desain UI/UX baru sesuai konsep kids learning
+- [x] Jalur audio Hijaiyah diselaraskan
+- [x] Web Speech Recognition dapat dihentikan secara nyata
+- [x] Dynamic Tailwind class diganti variant map statis
+- [x] Config, hooks, quiz helper, dan progress helper dipisahkan
+- [x] Supabase Auth dihubungkan secara kondisional
+- [x] Cache audio LRU dan cleanup playback
+- [x] Error, loading, not-found, dan global error fallback
+- [x] Security headers dasar
+- [x] Zustand persistence versioning dan partial persistence
+- [x] Unit test dan GitHub Actions quality gates
 
-### 🧹 P1: kesehatan codebase
+### 🔥 Berikutnya
 
-- [ ] Migrasikan test yang masih relevan dari aplikasi lama
-- [ ] Tambahkan script `typecheck` dan `test`
-- [ ] Tambahkan GitHub Actions untuk lint, test, dan build
-- [ ] Pindahkan `_old_vite_app` ke branch/tag legacy
-- [ ] Hapus import, resource, dan fitur mati yang tidak digunakan
-- [ ] Tambahkan migrasi versi pada Zustand Persist
-
-### ☁️ P2: production architecture
-
-- [ ] Supabase Auth untuk akun orang tua
-- [ ] Child profile di bawah akun keluarga
-- [ ] Sinkronisasi progres dan riwayat kuis
-- [ ] Row Level Security
+- [ ] Review seluruh konten agama dan audio oleh ahli
+- [ ] Migrasi profil keluarga serta progres ke Supabase
+- [ ] Row Level Security untuk keluarga dan child profile
 - [ ] Timer Game Zone yang divalidasi server
+- [ ] Test komponen dengan React Testing Library
+- [ ] End-to-end test dengan Playwright
 - [ ] PWA dan offline support penuh
 - [ ] Halaman profil, bahasa, tema, dan hafalan surah
+- [ ] Pindahkan `_old_vite_app` ke branch atau tag legacy
+- [ ] Tentukan dan tambahkan lisensi project
 
 ---
 
-## 🤝 Kontribusi
+## 🤖 Review dengan AGY
 
-Kontribusi sangat terbuka, khususnya untuk:
+Sebelum merge:
 
-- koreksi konten dan sumber agama,
-- aksesibilitas untuk anak,
-- pengujian,
-- performa audio,
-- sinkronisasi cloud,
-- dan pengalaman orang tua/pembimbing. 🌱
-
-Alur yang disarankan:
-
-1. Buat branch dari `main`.
-2. Lakukan perubahan kecil dan terfokus.
-3. Jalankan lint dan build.
-4. Buat Pull Request dengan ringkasan dan bukti pengujian.
-
----
-
-## 📜 Lisensi
-
-Lisensi project belum ditentukan. Tambahkan file `LICENSE` sebelum mendistribusikan atau menerima kontribusi dalam skala lebih luas.
+1. Review setiap Draft PR sesuai urutan branch stack.
+2. Pastikan seluruh quality gate hijau.
+3. Periksa mobile, tablet, dan desktop.
+4. Periksa keyboard navigation, focus state, kontras, dan reduced motion.
+5. Periksa Supabase Auth tanpa memasukkan secret ke repository.
+6. Jangan merge apabila masih ada komentar unresolved atau status gagal.
 
 ---
 
